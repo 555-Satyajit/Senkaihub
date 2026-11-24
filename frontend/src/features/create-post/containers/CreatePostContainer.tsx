@@ -211,94 +211,62 @@ export function CreatePostContainer() {
 
             {/* Caption Textarea */}
             <div className="flex flex-col gap-2">
-              <Label htmlFor="caption-input" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Caption & Details
-              </Label>
-              <Textarea
+              <textarea
                 id="caption-input"
-                rows={4}
+                rows={3}
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="Write your anime thoughts, context, or artwork techniques..."
-                className="w-full rounded-xl bg-secondary/50 border-border/70 p-3.5 text-sm text-foreground placeholder:text-muted-foreground/60 resize-none focus-visible:border-primary"
+                placeholder="Write caption, anime context, or add #hashtags directly..."
+                className="w-full rounded-2xl bg-secondary/40 border border-border/60 p-4 text-sm text-foreground placeholder:text-muted-foreground/60 resize-none focus:outline-none focus:border-border/90 transition-all leading-relaxed"
               />
             </div>
 
-            {/* Hashtag Manager */}
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="tags-input" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                Hashtags
-              </Label>
-              <div className="flex flex-wrap items-center gap-2 p-2 rounded-xl bg-secondary/50 border border-border/70 min-h-[44px]">
-                {tags.map((tag) => (
-                  <Badge
-                    key={tag}
-                    variant="outline"
-                    className="text-xs font-semibold px-2 py-0.5 rounded-md gap-1 bg-card border-border/80 hover:text-destructive hover:border-destructive/40 transition-colors cursor-pointer"
-                    onClick={() => handleRemoveTag(tag)}
-                  >
-                    <span>{tag}</span>
-                    <span className="text-[10px] font-bold">×</span>
-                  </Badge>
-                ))}
-                <div className="flex items-center gap-1 flex-1 min-w-[120px]">
-                  <Hash className="w-3.5 h-3.5 text-muted-foreground ml-1" />
-                  <Input
-                    id="tags-input"
-                    type="text"
-                    placeholder="Type tag and press Enter..."
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyDown={handleAddTag}
-                    className="border-0 bg-transparent h-7 p-0 text-xs focus-visible:ring-0 shadow-none"
-                  />
-                </div>
-              </div>
+            {/* Quick Tag Pills Row (Tap to insert directly into caption) */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
+                <Hash className="w-3 h-3" /> Popular:
+              </span>
+              {["#SoloLeveling", "#FanArt", "#DemonSlayer", "#JJK", "#MangaTheory"].map((tag) => (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => {
+                    if (!caption.includes(tag)) {
+                      setCaption((prev) => (prev ? `${prev} ${tag}` : tag));
+                    }
+                  }}
+                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/50 transition-colors cursor-pointer"
+                >
+                  {tag}
+                </button>
+              ))}
             </div>
 
-            {/* Safety & Clan Protection Toggles */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-1">
-              <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center text-primary shrink-0 border border-border/50">
-                    <ShieldAlert className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <Label htmlFor="spoiler-toggle" className="text-xs font-bold text-foreground cursor-pointer block leading-tight">
-                      Spoiler Guard
-                    </Label>
-                    <span className="text-[10px] text-muted-foreground">
-                      Blur image for spoilers
-                    </span>
-                  </div>
-                </div>
+            {/* Clean Minimal Protective Options */}
+            <div className="flex items-center gap-6 py-2 border-t border-border/40">
+              <label htmlFor="spoiler-toggle" className="flex items-center gap-2 cursor-pointer select-none">
                 <Switch
                   id="spoiler-toggle"
                   checked={isSpoiler}
                   onCheckedChange={setIsSpoiler}
                 />
-              </div>
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <ShieldAlert className="w-3.5 h-3.5 text-primary" />
+                  Spoiler Warning
+                </span>
+              </label>
 
-              <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-lg bg-card flex items-center justify-center text-accent shrink-0 border border-border/50">
-                    <Users className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <Label htmlFor="clan-toggle" className="text-xs font-bold text-foreground cursor-pointer block leading-tight">
-                      Clan Exclusive
-                    </Label>
-                    <span className="text-[10px] text-muted-foreground">
-                      Only Shadow Monarchs
-                    </span>
-                  </div>
-                </div>
+              <label htmlFor="clan-toggle" className="flex items-center gap-2 cursor-pointer select-none">
                 <Switch
                   id="clan-toggle"
                   checked={clanExclusive}
                   onCheckedChange={setClanExclusive}
                 />
-              </div>
+                <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                  <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                  Clan Exclusive
+                </span>
+              </label>
             </div>
 
             {/* Submit Action */}
