@@ -121,25 +121,52 @@ export function SidebarNav() {
         <nav aria-label="Main Navigation" className="flex flex-col items-center w-full">
           {topNavItems.map(renderNavItem)}
 
-          {/* Create Post Button in the MIDDLE - Linked to /create-post */}
-          <div className="my-2">
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Link
-                    href="/create-post"
-                    aria-label="Create Post"
-                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-all duration-200 group active:scale-95 cursor-pointer"
-                  />
-                }
-              >
-                <Plus aria-hidden="true" focusable="false" className="w-7 h-7 stroke-[1.9] transition-transform group-hover:scale-110" />
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                <p className="font-semibold text-xs">Create Post</p>
-              </TooltipContent>
-            </Tooltip>
-          </div>
+          {/* Create Post Button in the MIDDLE - Linked to /create-post with Subtractive Notch when active */}
+          {pathname === "/create-post" ? (
+            <div className="relative w-full my-2">
+              {/* Top smooth inverted fillet into background canvas */}
+              <div className="absolute right-0 -top-6 w-6 h-6 overflow-hidden pointer-events-none z-20" aria-hidden="true">
+                <div className="w-full h-full rounded-br-[20px] bg-card shadow-[0_12px_0_0_var(--background)]" />
+              </div>
+
+              {/* Subtracted Cutout Tab extending flush to the canvas edge */}
+              <div className="w-full h-20 bg-background rounded-l-[32px] flex items-center justify-center pl-2 relative z-10">
+                <Link
+                  href="/create-post"
+                  aria-current="page"
+                  aria-label="Create Post"
+                  className="w-14 h-14 rounded-full flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/35 transition-transform hover:scale-105 active:scale-95"
+                  style={{ background: "var(--gradient-btn)" }}
+                >
+                  <Plus aria-hidden="true" focusable="false" className="w-7 h-7 stroke-[2.4]" />
+                </Link>
+              </div>
+
+              {/* Bottom smooth inverted fillet into background canvas */}
+              <div className="absolute right-0 -bottom-6 w-6 h-6 overflow-hidden pointer-events-none z-20" aria-hidden="true">
+                <div className="w-full h-full rounded-tr-[20px] bg-card shadow-[0_-12px_0_0_var(--background)]" />
+              </div>
+            </div>
+          ) : (
+            <div className="my-2">
+              <Tooltip>
+                <TooltipTrigger
+                  render={
+                    <Link
+                      href="/create-post"
+                      aria-label="Create Post"
+                      className="w-14 h-14 rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-all duration-200 group active:scale-95 cursor-pointer"
+                    />
+                  }
+                >
+                  <Plus aria-hidden="true" focusable="false" className="w-7 h-7 stroke-[1.9] transition-transform group-hover:scale-110" />
+                </TooltipTrigger>
+                <TooltipContent side="right">
+                  <p className="font-semibold text-xs">Create Post</p>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          )}
 
           {/* Navigation list: Bottom items (Chat, Tracker) */}
           {bottomNavItems.map(renderNavItem)}
