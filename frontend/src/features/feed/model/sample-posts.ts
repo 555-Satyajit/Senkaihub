@@ -1,0 +1,68 @@
+import { PostItem } from "./feed-types";
+
+export const sampleFeedPosts: PostItem[] = [
+  {
+    id: "post-1",
+    author: {
+      name: "Akira Kenji",
+      username: "akirakenji_art",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80",
+      clan: "Shadow Monarchs",
+      clanBadgeColor: "#7940CF",
+      verified: true,
+    },
+    animeTitle: "Solo Leveling",
+    animeEpisode: "Episode 12",
+    spoilerSafeFor: "Ep. 12+",
+    category: "Fan Art",
+    caption: "Sung Jin-Woo rising in the monarch throne room. Took me 16 hours to finish the shadow mist rendering on Procreate! Submitting this for this week's Clan War showdown 🔥⚔️",
+    hashtags: ["#SoloLeveling", "#JinWoo", "#ShadowMonarchs", "#ClanWars", "#AnimeArt"],
+    imageUrl: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=1200&auto=format&fit=crop&q=80",
+    likesCount: 1842,
+    commentsCount: 94,
+    clanPointsEarned: 120,
+    timeAgo: "2h ago",
+    viewsCount: "14.2k",
+    topLikedBy: {
+      username: "levi_ackerman_fan",
+      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=60&auto=format&fit=crop&q=80",
+    },
+    otherLikesCount: 1841,
+    pinnedComment: {
+      user: "StrawHatCaptain",
+      text: "Even as rival clan, this shading is insane! Deserves the victory points 🔥",
+    },
+  },
+  {
+    id: "post-2",
+    author: {
+      name: "Yuna Cosplay",
+      username: "yunacos_official",
+      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=160&auto=format&fit=crop&q=80",
+      clan: "Demon Slayer Corps",
+      clanBadgeColor: "#ff2a36",
+      verified: true,
+    },
+    animeTitle: "Demon Slayer",
+    animeEpisode: "Hashira Training Arc",
+    spoilerSafeFor: "Manga Readers",
+    category: "Cosplay",
+    caption: "My hand-crafted Mitsuri Kanroji Nichirin whip sword in motion! Ready for our clan rally this weekend. Which Hashira should I craft next?",
+    hashtags: ["#DemonSlayer", "#KimetsuNoYaiba", "#MitsuriKanroji", "#CosplayWar"],
+    imageUrl: "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=1200&auto=format&fit=crop&q=80",
+    likesCount: 3290,
+    commentsCount: 182,
+    clanPointsEarned: 250,
+    timeAgo: "5h ago",
+    viewsCount: "28.5k",
+    topLikedBy: {
+      username: "tanjiro_sun",
+      avatar: "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=60&auto=format&fit=crop&q=80",
+    },
+    otherLikesCount: 3289,
+    pinnedComment: {
+      user: "RengokuFlame",
+      text: "Set your heart ablaze! Awesome prop craftsmanship!",
+    },
+  },
+];
