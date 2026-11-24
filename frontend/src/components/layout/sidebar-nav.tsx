@@ -121,13 +121,13 @@ export function SidebarNav() {
         <nav aria-label="Main Navigation" className="flex flex-col items-center w-full">
           {topNavItems.map(renderNavItem)}
 
-          {/* Create Post Button in the MIDDLE - Neutral unselected state matching other nav buttons */}
+          {/* Create Post Button in the MIDDLE - Linked to /create-post */}
           <div className="my-2">
             <Tooltip>
               <TooltipTrigger
                 render={
-                  <button
-                    type="button"
+                  <Link
+                    href="/create-post"
                     aria-label="Create Post"
                     className="w-14 h-14 rounded-2xl flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary/40 transition-all duration-200 group active:scale-95 cursor-pointer"
                   />

@@ -48,14 +48,14 @@ export function TopHeader() {
         </Button>
 
         {/* Plus Icon for Creating Post */}
-        <Button
-          size="icon"
+        <Link
+          href="/create-post"
           aria-label="Create Post"
           className="w-9 h-9 rounded-xl text-primary-foreground shadow-md border-0 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center"
           style={{ background: "var(--gradient-btn)" }}
         >
           <Plus aria-hidden="true" focusable="false" className="w-5 h-5 stroke-[2.6]" />
-        </Button>
+        </Link>
 
         {/* Notifications Button */}
         <div className="relative w-9 h-9">
