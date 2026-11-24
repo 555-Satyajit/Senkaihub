@@ -6,8 +6,10 @@ export interface ClanAchievement {
   title: string;
   description: string;
   tier: "Gold" | "Crimson" | "Diamond";
-  unlockedAt: string;
-  iconType: "trophy" | "flame" | "shield" | "swords";
+  unlockedAt?: string;
+  isLocked?: boolean;
+  progress?: string;
+  iconType: "trophy" | "flame" | "shield" | "swords" | "crown" | "star" | "zap" | "target";
 }
 
 export interface UserProfile {
@@ -150,10 +152,10 @@ export const sampleUserProfile: UserProfile = {
   achievements: [
     {
       id: "ach-1",
-      title: "Clan War Champion - Week 4",
+      title: "Clan War Champion",
       description: "Led Shadow Monarchs to victory against Straw Hat Fleet with 28k Victory Points.",
       tier: "Crimson",
-      unlockedAt: "2 days ago",
+      unlockedAt: "11/22/2024",
       iconType: "trophy",
     },
     {
@@ -161,15 +163,15 @@ export const sampleUserProfile: UserProfile = {
       title: "Master Shard Igniter",
       description: "Earned over 10,000 community Soul Shards across fan art submissions.",
       tier: "Diamond",
-      unlockedAt: "1 week ago",
+      unlockedAt: "11/17/2024",
       iconType: "flame",
     },
     {
       id: "ach-3",
-      title: "Shadow Vanguard Veteran",
+      title: "Shadow Vanguard",
       description: "Completed 50 co-op raid boss events without a single squad wipe.",
       tier: "Gold",
-      unlockedAt: "2 weeks ago",
+      unlockedAt: "11/10/2024",
       iconType: "shield",
     },
     {
@@ -177,8 +179,42 @@ export const sampleUserProfile: UserProfile = {
       title: "Spoiler Shield Guardian",
       description: "Verified accurate episode spoiler tags on 100+ community discussions.",
       tier: "Gold",
-      unlockedAt: "1 month ago",
+      unlockedAt: "10/25/2024",
       iconType: "swords",
+    },
+    {
+      id: "ach-5",
+      title: "Top 1% Creator",
+      description: "Ranked among the top 1% community anime creators this season.",
+      tier: "Crimson",
+      unlockedAt: "10/12/2024",
+      iconType: "crown",
+    },
+    {
+      id: "ach-6",
+      title: "Raid Tactician",
+      description: "Coordinated 10 successful guild dungeon conquests in Clan Wars.",
+      tier: "Diamond",
+      unlockedAt: "09/30/2024",
+      iconType: "zap",
+    },
+    {
+      id: "ach-7",
+      title: "Legendary Hunter",
+      description: "Reach Hunter Level 20 in the seasonal Clan Pass.",
+      tier: "Crimson",
+      isLocked: true,
+      progress: "12/20",
+      iconType: "star",
+    },
+    {
+      id: "ach-8",
+      title: "Shadow Sovereign",
+      description: "Unlock the ultimate Monarch title by securing #1 guild leaderboard.",
+      tier: "Gold",
+      isLocked: true,
+      progress: "Locked",
+      iconType: "target",
     },
   ],
 };
