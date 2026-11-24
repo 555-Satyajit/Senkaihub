@@ -17,6 +17,14 @@ export function ChatInput({ value, onChange, onSubmit, recipientName }: ChatInpu
       <div className="relative flex-1 min-w-0 bg-secondary/50 hover:bg-secondary/70 focus-within:bg-secondary border border-border/60 rounded-2xl flex items-center px-4 py-2.5 min-h-[52px] transition-all">
         <textarea
           value={value}
+          onBlur={() => {
+            // Reset any rogue viewport scroll on iOS when virtual keyboard closes
+            setTimeout(() => {
+              window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+              document.body.scrollTop = 0;
+              document.documentElement.scrollTop = 0;
+            }, 100);
+          }}
           onChange={(e) => {
             onChange(e.target.value);
             e.target.style.height = "auto";

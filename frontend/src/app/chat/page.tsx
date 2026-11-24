@@ -9,14 +9,14 @@ export default function ChatPage() {
   const [isMobileChatOpen, setIsMobileChatOpen] = useState(false);
 
   return (
-    <div className="flex h-dvh bg-background text-foreground overflow-hidden">
+    <div className="fixed inset-0 w-full h-full flex bg-background text-foreground overflow-hidden select-none">
       {/* 1. Desktop Left Navigation Bar */}
       <SidebarNav />
 
       {/* 2. Main Content Canvas */}
       <div className="flex-1 flex flex-col min-w-0 h-full overflow-hidden relative">
         <main
-          className={`flex-1 w-full min-h-0 flex flex-col overflow-hidden ${
+          className={`flex-1 w-full min-h-0 h-full flex flex-col overflow-hidden ${
             isMobileChatOpen
               ? "pb-0"
               : "pb-[calc(4.5rem+env(safe-area-inset-bottom,0px))] md:pb-0"
