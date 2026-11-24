@@ -1,37 +1,39 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit configuration for SenkaiHub
 # Documentation: https://docs.coderabbit.ai/guides/configure-coderabbit
 
-version: "2"
 language: "en-US"
 
 reviews:
-  profile: "chill" # Options: assertive, chill
+  profile: "chill"
   request_changes_workflow: false
   high_level_summary: true
   auto_review:
     enabled: true
     drafts: false
-  
-  # Inject SenkaiHub's permanent architectural & styling rules into CodeRabbit's context
-  instructions: |
-    You are reviewing code for SenkaiHub, a community platform built with Next.js (App Router), React 19, TypeScript, and Tailwind CSS.
-    
-    Always enforce the following project rules:
-    1. Architecture & Layering:
-       - Strictly adhere to: `api/` -> `model/` -> `hooks/` -> `containers/` -> `components/`.
-       - Presentational components in `components/` must only accept props and return JSX with NO embedded fetch calls or business logic.
-    2. Design Tokens & Styling:
-       - Zero hardcoded arbitrary hex colors (e.g. NEVER allow `bg-[#1a1b22]` or inline `color: #fff`).
-       - All colors and theme values MUST come from `globals.css` design tokens:
-         - `bg-background` (`--background`)
-         - `bg-card` / `text-card-foreground` (`--card`)
-         - `bg-secondary` (`--secondary`)
-         - `bg-muted` / `text-muted-foreground` (`--muted`)
-         - `border-border` (`--border`)
-         - `text-primary` / `bg-primary` (`--primary` - Crimson Flame)
-         - `text-accent` / `bg-accent` (`--accent` - Solar Flame Gold)
-    3. UI Components:
-       - Prefer shadcn/ui primitives (`src/components/ui/`) over custom ad-hoc controls.
-    4. Code Quality:
-       - Ensure accessibility attributes (`aria-label`, `aria-hidden`) on icons and icon-only buttons.
-       - Clean TypeScript types without `any`.
+
+  # Enforce SenkaiHub's permanent architectural & styling rules across all frontend files
+  path_instructions:
+    - path: "frontend/**"
+      instructions: |
+        You are reviewing code for SenkaiHub, built with Next.js (App Router), React 19, TypeScript, and Tailwind CSS.
+        
+        Always enforce the following project rules:
+        1. Architecture & Layering:
+           - Strictly adhere to: `api/` -> `model/` -> `hooks/` -> `containers/` -> `components/`.
+           - Presentational components in `components/` must only accept props and return JSX with NO embedded fetch calls or business logic.
+        2. Design Tokens & Styling:
+           - Zero hardcoded arbitrary hex colors (e.g. NEVER allow `bg-[#1a1b22]` or inline `color: #fff`).
+           - All colors and theme values MUST come from `globals.css` design tokens:
+             - `bg-background` (`--background`)
+             - `bg-card` / `text-card-foreground` (`--card`)
+             - `bg-secondary` (`--secondary`)
+             - `bg-muted` / `text-muted-foreground` (`--muted`)
+             - `border-border` (`--border`)
+             - `text-primary` / `bg-primary` (`--primary` - Crimson Flame)
+             - `text-accent` / `bg-accent` (`--accent` - Solar Flame Gold)
+        3. UI Components:
+           - Strictly use and prefer shadcn/ui primitives (`src/components/ui/`) over custom ad-hoc controls.
+        4. Code Quality & Accessibility:
+           - Ensure accessibility attributes (`aria-label`, `aria-hidden`) on icons and icon-only buttons.
+           - Clean TypeScript types without `any`.
