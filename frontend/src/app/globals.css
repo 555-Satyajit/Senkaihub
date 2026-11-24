@@ -155,3 +155,52 @@
 .animate-spark {
   animation: spark-float 0.6s ease-out forwards;
 }
+
+/* Custom Clean Scrollbar Utility */
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  /* Modern Subtle Dark Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  }
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  /* shadcn scroll-fade utilities */
+  .scroll-fade,
+  .scroll-fade-y {
+    mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+  }
+  .scroll-fade-b {
+    mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
+  }
+  .scroll-fade-t {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 48px);
+  }
+  .scroll-fade-both {
+    mask-image: linear-gradient(to bottom, transparent 0%, black 36px, black calc(100% - 48px), transparent 100%);
+  }
+  .scroll-fade-none {
+    mask-image: none;
+  }
+}

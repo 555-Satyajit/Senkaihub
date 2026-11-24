@@ -1,8 +1,8 @@
-export type PostClassification = 
-  | "Fan Art & Illustrations" 
-  | "Clan Raid Strategy" 
-  | "Manga & Theory" 
-  | "Cosplay Showcase" 
+export type PostClassification =
+  | "Fan Art & Illustrations"
+  | "Clan Raid Strategy"
+  | "Manga & Theory"
+  | "Cosplay Showcase"
   | "Battle Clips / AMV";
 
 export interface CreatePostPayload {

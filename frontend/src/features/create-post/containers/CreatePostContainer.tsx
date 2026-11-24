@@ -1,18 +1,19 @@
 "use client";
 
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { 
-  UploadCloud, 
-  ShieldAlert, 
-  Users, 
   X, 
   ChevronDown,
-  Smile,
   Check,
+  ImageIcon, 
+  ShieldAlert, 
+  Users, 
+  Smile, 
   Flame,
-  Send
+  Swords,
+  Tag
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -43,28 +44,15 @@ export function CreatePostContainer() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  const [rawText, setRawText] = useState(
-    "Solo Leveling Season 2 shadow army composition study. Exploring the contrast between purple soul shadows and fiery crimson battle auras.\n#SoloLeveling #ShadowMonarch #FanArt"
-  );
+  const [rawText, setRawText] = useState("");
   const [selectedClan, setSelectedClan] = useState<string>(CLAN_DESTINATIONS[0]);
   const [openClanCombobox, setOpenClanCombobox] = useState(false);
   const [classification, setClassification] = useState<PostClassification>("Fan Art & Illustrations");
   const [openCategoryCombobox, setOpenCategoryCombobox] = useState(false);
-  const [imageUrl, setImageUrl] = useState(
-    "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1000&auto=format&fit=crop&q=80"
-  );
+  const [imageUrl, setImageUrl] = useState<string>("");
   const [isSpoiler, setIsSpoiler] = useState(false);
   const [clanOnly, setClanOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Auto-expand textarea naturally up to a max-height, then scroll internally (just like Instagram)
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      const nextHeight = Math.min(180, textareaRef.current.scrollHeight);
-      textareaRef.current.style.height = `${nextHeight}px`;
-    }
-  }, [rawText]);
 
   // Parse hashtags in real-time
   const { cleanCaption, extractedTags } = useMemo(() => {
@@ -78,6 +66,10 @@ export function CreatePostContainer() {
       extractedTags: uniqueTags,
     };
   }, [rawText]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setRawText(e.target.value);
+  };
 
   const handleAddPopularTag = (tag: string) => {
     if (!rawText.includes(tag)) {
@@ -109,155 +101,77 @@ export function CreatePostContainer() {
     }, 450);
   };
 
+  const canPost = Boolean(rawText.trim() || imageUrl);
+
   return (
-    <div className="w-full flex flex-col gap-4 sm:gap-6">
-      {/* Top Header Row */}
-      <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-border/40 gap-3">
-        <div>
-          <h1 className="font-heading font-black text-lg sm:text-2xl text-foreground flex items-center gap-2">
-            <span>Publish Post</span>
-            <Flame className="w-5 h-5 text-primary" />
-          </h1>
-          <p className="text-xs text-muted-foreground hidden sm:block mt-0.5">
-            Share original artwork, chapter theories, or raid strategies to your Clan.
-          </p>
-        </div>
+    <div className="w-full max-w-[620px] mx-auto min-h-[580px] bg-card sm:rounded-[28px] border border-border/70 shadow-2xl flex flex-col justify-between overflow-hidden">
+      
+      {/* 1. Clean Native Modal Header */}
+      <div className="h-14 px-4 sm:px-6 border-b border-border/50 flex items-center justify-between shrink-0">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="w-9 h-9 rounded-full hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+          aria-label="Close"
+        >
+          <X className="w-5 h-5" />
+        </button>
 
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => router.back()}
-            className="rounded-xl text-xs font-semibold px-3 sm:px-4 cursor-pointer text-muted-foreground hover:text-foreground h-9"
-          >
-            Cancel
-          </Button>
+        <h2 className="font-heading font-bold text-base text-foreground">
+          Create Post
+        </h2>
 
-          <Button
-            type="button"
-            onClick={handleSubmit}
-            disabled={isSubmitting || (!rawText.trim() && !imageUrl)}
-            className="h-9 sm:h-10 px-4 sm:px-6 rounded-xl font-heading font-bold text-xs sm:text-sm text-primary-foreground shadow-md hover:brightness-110 border-0 cursor-pointer disabled:opacity-40"
-            style={{ background: "var(--gradient-btn)" }}
-          >
-            <Send className="w-3.5 h-3.5 mr-1.5" />
-            <span>{isSubmitting ? "Publishing..." : "Publish"}</span>
-          </Button>
-        </div>
+        <Button
+          type="button"
+          onClick={handleSubmit}
+          disabled={!canPost || isSubmitting}
+          className={`h-8 px-5 rounded-full font-heading font-bold text-xs shadow-sm transition-all border-0 cursor-pointer ${
+            canPost
+              ? "text-primary-foreground hover:brightness-110 active:scale-95"
+              : "bg-secondary text-muted-foreground/50 opacity-60 cursor-not-allowed"
+          }`}
+          style={canPost ? { background: "var(--gradient-btn)" } : undefined}
+        >
+          {isSubmitting ? "Posting..." : "Post"}
+        </Button>
       </div>
 
-      {/* Main Studio Area - Instagram fixed aspect ratio window: Image & details lock to identical height */}
-      <div className="w-full rounded-2xl sm:rounded-[24px] bg-card border border-border/60 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 lg:h-[580px] xl:h-[620px]">
+      {/* 2. Scrollable Body: Author + Category Pills + Pure Text Canvas */}
+      <div className="flex-1 p-4 sm:p-6 flex flex-col gap-3 overflow-y-auto">
         
-        {/* ================= MEDIA CANVAS: Locks to height on desktop ================= */}
-        <div className="lg:col-span-7 bg-background relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-border/60 min-h-[300px] sm:min-h-[400px] lg:h-full overflow-hidden">
-          {imageUrl ? (
-            <div className="relative w-full h-full min-h-[300px] sm:min-h-[400px] group flex items-center justify-center">
-              <Image
-                src={imageUrl}
-                alt="Post preview"
-                fill
-                priority
-                className={`object-contain transition-all ${isSpoiler ? "blur-xl scale-105" : ""}`}
-              />
-              
-              {/* Spoiler indicator overlay if enabled */}
-              {isSpoiler && (
-                <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-1.5 text-center p-4 z-10 pointer-events-none">
-                  <ShieldAlert className="w-8 h-8 text-primary" />
-                  <span className="text-xs font-bold text-foreground">Spoiler Warning Active</span>
-                  <span className="text-[10px] text-muted-foreground">Image will appear blurred to community</span>
-                </div>
-              )}
+        {/* Author Header & Destination Dropdowns */}
+        <div className="flex items-start gap-3">
+          <Avatar className="w-10 h-10 rounded-full ring-2 ring-border/80 shrink-0 mt-0.5">
+            <AvatarImage src={sampleUserProfile.avatar} alt={sampleUserProfile.name} />
+            <AvatarFallback>AK</AvatarFallback>
+          </Avatar>
 
-              {/* Change / Remove media floating pill */}
-              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between z-20">
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full bg-card/90 hover:bg-card text-foreground text-xs font-semibold backdrop-blur-md border border-border/80 transition-all cursor-pointer shadow-xl"
-                >
-                  Change Photo
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setImageUrl("")}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-card/90 hover:bg-card text-foreground flex items-center justify-center backdrop-blur-md border border-border/80 transition-all cursor-pointer shadow-xl"
-                  aria-label="Remove image"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-2.5 p-6 sm:p-8 text-center cursor-pointer select-none group w-full h-full"
-            >
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-secondary border border-border/80 flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:scale-105 transition-all shadow-md">
-                <UploadCloud className="w-7 h-7 sm:w-8 sm:h-8 stroke-[1.8]" />
-              </div>
-              <p className="font-heading font-semibold text-xs sm:text-sm text-foreground">
-                Select anime artwork or photos
-              </p>
-              <span className="text-[11px] sm:text-xs text-muted-foreground max-w-xs">
-                Drag photos and videos here from your device
+          <div className="flex flex-col min-w-0 flex-1 gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="font-heading font-bold text-sm text-foreground">
+                {sampleUserProfile.name}
               </span>
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="rounded-xl mt-1 text-xs font-semibold pointer-events-none border-border"
-              >
-                Select from device
-              </Button>
-            </div>
-          )}
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={handleFileChange}
-            className="hidden"
-          />
-        </div>
-
-        {/* ================= DETAILS & CONFIGURATION: Locked height container with internal smooth scroll ================= */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-5 sm:p-6 lg:p-7 gap-4 lg:h-full lg:overflow-y-auto scrollbar-thin">
-          <div className="flex flex-col gap-4">
-            
-            {/* User Identity Header */}
-            <div className="flex items-center gap-3">
-              <Avatar className="w-9 h-9 sm:w-10 sm:h-10 rounded-full ring-2 ring-border/80">
-                <AvatarImage src={sampleUserProfile.avatar} alt={sampleUserProfile.name} />
-                <AvatarFallback>AK</AvatarFallback>
-              </Avatar>
-              <div className="flex flex-col min-w-0">
-                <span className="font-heading font-bold text-xs sm:text-sm text-foreground truncate">
-                  {sampleUserProfile.name}
-                </span>
-                <span className="text-[11px] sm:text-xs text-primary font-semibold">
-                  Shadow Monarchs Faction
-                </span>
-              </div>
+              <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+              <span className="text-xs font-semibold text-primary truncate">
+                Shadow Monarchs
+              </span>
             </div>
 
-            {/* Clan Destination & Post Category Selectors (Single Clean Row) */}
-            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-              {/* 1. Searchable Shadcn Command Popover for Clan Destination */}
+            {/* Pill Selectors Row - Single Line Flow */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Clan Destination Combobox */}
               <Popover open={openClanCombobox} onOpenChange={setOpenClanCombobox}>
                 <PopoverTrigger
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/90 hover:bg-secondary text-xs font-medium text-foreground border border-border/80 transition-colors cursor-pointer"
                 >
-                  <span className="truncate max-w-[125px] sm:max-w-[140px]">{selectedClan}</span>
+                  <span className="truncate max-w-[140px]">{selectedClan}</span>
                   <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
+                <PopoverContent align="start" className="w-[230px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
                   <Command className="bg-transparent">
-                    <CommandInput placeholder="Search Clan..." className="h-9 text-xs" />
-                    <CommandList className="max-h-56 no-scrollbar p-1">
-                      <CommandEmpty className="text-xs text-muted-foreground py-4 text-center">
+                    <CommandInput placeholder="Search Clan..." className="h-8 text-xs" />
+                    <CommandList className="max-h-52 no-scrollbar p-1">
+                      <CommandEmpty className="text-xs text-muted-foreground py-3 text-center">
                         No Clan found.
                       </CommandEmpty>
                       <CommandGroup>
@@ -283,19 +197,19 @@ export function CreatePostContainer() {
                 </PopoverContent>
               </Popover>
 
-              {/* 2. Searchable Shadcn Command Popover for Post Category */}
+              {/* Classification Combobox */}
               <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
                 <PopoverTrigger
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/90 hover:bg-secondary text-xs font-medium text-foreground border border-border/80 transition-colors cursor-pointer"
                 >
-                  <span className="truncate max-w-[125px] sm:max-w-[140px]">{classification}</span>
+                  <span className="truncate max-w-[140px]">{classification}</span>
                   <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
+                <PopoverContent align="start" className="w-[230px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
                   <Command className="bg-transparent">
-                    <CommandInput placeholder="Search Category..." className="h-9 text-xs" />
-                    <CommandList className="max-h-56 no-scrollbar p-1">
-                      <CommandEmpty className="text-xs text-muted-foreground py-4 text-center">
+                    <CommandInput placeholder="Search Category..." className="h-8 text-xs" />
+                    <CommandList className="max-h-52 no-scrollbar p-1">
+                      <CommandEmpty className="text-xs text-muted-foreground py-3 text-center">
                         No category found.
                       </CommandEmpty>
                       <CommandGroup>
@@ -321,90 +235,118 @@ export function CreatePostContainer() {
                 </PopoverContent>
               </Popover>
             </div>
-
-            {/* Instagram Style Caption: Capped height, borderless, scrolls internally without blowing up the window */}
-            <div className="flex flex-col relative pt-1">
-              <textarea
-                ref={textareaRef}
-                value={rawText}
-                onChange={(e) => setRawText(e.target.value)}
-                placeholder="Write a caption and type #hashtags..."
-                className="w-full bg-transparent border-0 p-0 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 leading-relaxed resize-none scrollbar-none max-h-[180px] overflow-y-auto"
-              />
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground/60 pt-2 border-t border-border/30 mt-1">
-                <button
-                  type="button"
-                  onClick={() => setRawText((prev) => prev + " 🔥")}
-                  className="hover:text-accent transition-colors cursor-pointer"
-                >
-                  <Smile className="w-4 h-4" />
-                </button>
-                <span>{rawText.length}/500</span>
-              </div>
-            </div>
-
-            {/* Extracted Hashtag Badges Preview */}
-            <div className="flex flex-col gap-2 pt-1 border-t border-border/40">
-              <div className="flex items-center gap-1.5 flex-wrap">
-                <span className="text-[11px] font-semibold text-muted-foreground">Hashtags:</span>
-                {extractedTags.length > 0 ? (
-                  extractedTags.map((tag) => (
-                    <span key={tag} className="text-xs font-bold text-primary hover:underline cursor-pointer">
-                      {tag}
-                    </span>
-                  ))
-                ) : (
-                  <span className="text-[11px] text-muted-foreground/60 italic">
-                    Type #tag in caption or tap below
-                  </span>
-                )}
-              </div>
-
-              {/* Quick Add Pills */}
-              <div className="flex items-center gap-1.5 flex-wrap">
-                {POPULAR_TAGS.slice(0, 5).map((tag) => (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={() => handleAddPopularTag(tag)}
-                    className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-secondary/80 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/50 transition-colors cursor-pointer"
-                  >
-                    + {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
           </div>
+        </div>
 
-          {/* Bottom Options: Minimal Toggles */}
-          <div className="flex flex-col gap-3 pt-3 border-t border-border/40 text-xs">
-            <label htmlFor="spoiler-toggle" className="flex items-center justify-between cursor-pointer select-none">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-primary" />
-                <span className="font-semibold text-foreground">Spoiler Warning</span>
-              </div>
-              <Switch
-                id="spoiler-toggle"
-                checked={isSpoiler}
-                onCheckedChange={setIsSpoiler}
-              />
-            </label>
+        {/* Natural Full Canvas Textarea ("What do you want to talk about?") */}
+        <textarea
+          ref={textareaRef}
+          value={rawText}
+          onChange={handleTextChange}
+          placeholder="What do you want to talk about?"
+          className="w-full flex-1 min-h-[160px] sm:min-h-[220px] bg-transparent border-0 p-0 text-base sm:text-lg text-foreground placeholder:text-muted-foreground/45 focus:outline-none focus:ring-0 leading-relaxed resize-none mt-2 custom-scrollbar overflow-y-auto"
+          autoFocus
+        />
 
-            <label htmlFor="clan-toggle" className="flex items-center justify-between cursor-pointer select-none">
-              <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-muted-foreground" />
-                <span className="font-semibold text-foreground">Clan Vault Only</span>
+        {/* Media Preview Thumbnail (If Photo Added) */}
+        {imageUrl && (
+          <div className="relative w-full h-[220px] sm:h-[260px] rounded-2xl overflow-hidden border border-border/70 bg-black/40 group mt-2">
+            <Image
+              src={imageUrl}
+              alt="Attached artwork"
+              fill
+              className={`object-cover transition-all ${isSpoiler ? "blur-md scale-105" : ""}`}
+            />
+            {isSpoiler && (
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm flex flex-col items-center justify-center gap-1 text-center p-3">
+                <ShieldAlert className="w-6 h-6 text-primary" />
+                <span className="text-xs font-bold text-foreground">Spoiler Warning Active</span>
               </div>
-              <Switch
-                id="clan-toggle"
-                checked={clanOnly}
-                onCheckedChange={setClanOnly}
-              />
-            </label>
+            )}
+            <button
+              type="button"
+              onClick={() => setImageUrl("")}
+              className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-black/70 hover:bg-black text-white flex items-center justify-center transition-transform hover:scale-110 cursor-pointer shadow-md"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
+        )}
 
+        {/* Quick Tags Row */}
+        <div className="flex items-center gap-1.5 flex-wrap pt-2">
+          {POPULAR_TAGS.slice(0, 5).map((tag) => (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => handleAddPopularTag(tag)}
+              className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-secondary/80 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/50 transition-colors cursor-pointer"
+            >
+              {tag}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* 3. Bottom Action Tray ("Add to your post") */}
+      <div className="border-t border-border/50 bg-secondary/20 p-3 sm:p-4 flex flex-col gap-2.5">
+        <span className="text-xs font-bold text-muted-foreground px-1">
+          Add to your post
+        </span>
+
+        {/* 2 Action Tiles: Photo & Spoiler */}
+        <div className="grid grid-cols-2 gap-2">
+          
+          {/* Photo/Video Tile */}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex items-center justify-between p-3 rounded-xl bg-card hover:bg-secondary/70 border border-border/60 transition-all text-left group cursor-pointer"
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-blue-500/15 text-blue-400 flex items-center justify-center border border-blue-500/20">
+                <ImageIcon className="w-4 h-4" />
+              </div>
+              <span className="font-heading font-semibold text-xs text-foreground">
+                Photo/Artwork
+              </span>
+            </div>
+            <span className="text-xs text-muted-foreground group-hover:text-foreground">+</span>
+          </button>
+
+          {/* Spoiler Warning Tile */}
+          <button
+            type="button"
+            onClick={() => setIsSpoiler(!isSpoiler)}
+            className={`flex items-center justify-between p-3 rounded-xl border transition-all text-left cursor-pointer ${
+              isSpoiler
+                ? "bg-primary/10 border-primary/40 text-primary"
+                : "bg-card hover:bg-secondary/70 border-border/60 text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center border ${
+                isSpoiler ? "bg-primary/20 text-primary border-primary/30" : "bg-red-500/15 text-red-400 border-red-500/20"
+              }`}>
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <span className="font-heading font-semibold text-xs text-foreground">
+                Spoiler Blur
+              </span>
+            </div>
+            <span className="text-xs">{isSpoiler ? "✓" : "+"}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
     </div>
   );
 }
