@@ -265,16 +265,16 @@ export function CreatePostContainer() {
                 </DropdownMenu>
               </div>
 
-              {/* Caption Textarea (Instagram borderless style) */}
+              {/* Caption Textarea with scrollbar styling */}
               <div className="flex flex-col gap-1 relative">
                 <textarea
-                  rows={5}
+                  rows={4}
                   value={rawText}
                   onChange={(e) => setRawText(e.target.value)}
                   placeholder="Write a caption and type #hashtags..."
-                  className="w-full bg-transparent border-0 resize-none text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 leading-relaxed"
+                  className="w-full bg-secondary/30 rounded-xl p-3 border border-border/50 resize-none text-xs sm:text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:border-border leading-relaxed scrollbar-thin"
                 />
-                <div className="flex items-center justify-between text-[11px] text-muted-foreground/60 pt-1">
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground/60 px-1 pt-0.5">
                   <button
                     type="button"
                     onClick={() => setRawText((prev) => prev + " 🔥")}
