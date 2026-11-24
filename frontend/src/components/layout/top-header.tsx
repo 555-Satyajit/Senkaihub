@@ -101,15 +101,21 @@ export function TopHeader() {
           </Button>
         </div>
 
-        {/* User Profile Avatar */}
+        {/* User Profile Avatar Link */}
         <div className="relative w-[50px] h-[50px]">
-          <Avatar className="w-[50px] h-[50px] rounded-[18px] after:border-0 overflow-hidden shadow-sm">
-            <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=140&auto=format&fit=crop&q=80" alt="Kevin" className="object-cover rounded-[18px]" />
-            <AvatarFallback className="rounded-[18px] bg-secondary text-foreground font-semibold">
-              KV
-            </AvatarFallback>
-          </Avatar>
-          <span className="absolute top-1 right-1 w-[9px] h-[9px] bg-[#65EFAD] rounded-full ring-2 ring-card shadow-sm pointer-events-none" />
+          <Link
+            href="/profile"
+            aria-label="View Profile"
+            className="block w-[50px] h-[50px] rounded-[18px] transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+          >
+            <Avatar className="w-[50px] h-[50px] rounded-[18px] after:border-0 overflow-hidden shadow-sm hover:ring-2 hover:ring-primary/60 transition-all">
+              <AvatarImage src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=140&auto=format&fit=crop&q=80" alt="Kevin" className="object-cover rounded-[18px]" />
+              <AvatarFallback className="rounded-[18px] bg-secondary text-foreground font-semibold">
+                KV
+              </AvatarFallback>
+            </Avatar>
+            <span className="absolute top-1 right-1 w-[9px] h-[9px] bg-[#65EFAD] rounded-full ring-2 ring-card shadow-sm pointer-events-none" />
+          </Link>
         </div>
       </div>
     </header>
