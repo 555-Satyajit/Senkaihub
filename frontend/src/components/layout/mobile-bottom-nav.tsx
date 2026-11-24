@@ -33,10 +33,12 @@ export function MobileBottomNav() {
       aria-label="Mobile Navigation" 
       className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border/60 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_30px_rgba(0,0,0,0.6)]"
     >
-      <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto relative px-2">
-        {mobileNavItems.map((item) => {
+      <div className="flex items-center justify-around h-[68px] max-w-lg mx-auto relative px-4">
+        {mobileNavItems.map((item, index) => {
           const Icon = item.icon;
           const isActive = pathname === item.href || (item.href === "/feed" && pathname === "/");
+          const isFirst = index === 0;
+          const isLast = index === mobileNavItems.length - 1;
 
           if (isActive) {
             return (
@@ -44,13 +46,15 @@ export function MobileBottomNav() {
                 key={item.label} 
                 className="relative flex-1 flex flex-col items-center justify-center -top-3.5 group select-none"
               >
-                {/* Left Outer Inverted Smooth Curve (Subtractive Hole Flange) */}
-                <div 
-                  className="absolute -left-3.5 top-3.5 w-3.5 h-3.5 overflow-hidden pointer-events-none" 
-                  aria-hidden="true"
-                >
-                  <div className="w-full h-full rounded-tr-xl bg-card shadow-[-4px_-4px_0_4px_var(--background)]" />
-                </div>
+                {/* Left Outer Inverted Smooth Curve (Subtractive Hole Flange) - hide if first item to avoid viewport edge clip */}
+                {!isFirst && (
+                  <div 
+                    className="absolute -left-3.5 top-3.5 w-3.5 h-3.5 overflow-hidden pointer-events-none" 
+                    aria-hidden="true"
+                  >
+                    <div className="w-full h-full rounded-tr-xl bg-card shadow-[-4px_-4px_0_4px_var(--background)]" />
+                  </div>
+                )}
 
                 {/* Sunken Hole Cutout Well blending directly with page background */}
                 <div 
@@ -80,13 +84,15 @@ export function MobileBottomNav() {
                   </Link>
                 </div>
 
-                {/* Right Outer Inverted Smooth Curve (Subtractive Hole Flange) */}
-                <div 
-                  className="absolute -right-3.5 top-3.5 w-3.5 h-3.5 overflow-hidden pointer-events-none" 
-                  aria-hidden="true"
-                >
-                  <div className="w-full h-full rounded-tl-xl bg-card shadow-[4px_-4px_0_4px_var(--background)]" />
-                </div>
+                {/* Right Outer Inverted Smooth Curve (Subtractive Hole Flange) - hide if last item to avoid viewport edge clip */}
+                {!isLast && (
+                  <div 
+                    className="absolute -right-3.5 top-3.5 w-3.5 h-3.5 overflow-hidden pointer-events-none" 
+                    aria-hidden="true"
+                  >
+                    <div className="w-full h-full rounded-tl-xl bg-card shadow-[4px_-4px_0_4px_var(--background)]" />
+                  </div>
+                )}
 
                 {/* Active Text Label */}
                 <span className="text-[10px] font-bold text-foreground mt-0.5 tracking-tight">
