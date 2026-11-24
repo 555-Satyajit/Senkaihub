@@ -1,23 +1,17 @@
 "use client";
 
-import { useState, useRef, useMemo } from "react";
+import { useState, useRef } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { 
   X, 
-  ChevronDown,
-  Check,
+  ChevronDown, 
+  Check, 
   ImageIcon, 
-  ShieldAlert, 
-  Users, 
-  Smile, 
-  Flame,
-  Swords,
-  Tag
+  ShieldAlert 
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
 import {
   Popover,
   PopoverContent,
@@ -51,21 +45,7 @@ export function CreatePostContainer() {
   const [openCategoryCombobox, setOpenCategoryCombobox] = useState(false);
   const [imageUrl, setImageUrl] = useState<string>("");
   const [isSpoiler, setIsSpoiler] = useState(false);
-  const [clanOnly, setClanOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  // Parse hashtags in real-time
-  const { cleanCaption, extractedTags } = useMemo(() => {
-    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
-    const matches = rawText.match(hashtagRegex) || [];
-    const uniqueTags = Array.from(new Set(matches));
-    const textWithoutTags = rawText.replace(hashtagRegex, "").trim();
-
-    return {
-      cleanCaption: textWithoutTags || rawText,
-      extractedTags: uniqueTags,
-    };
-  }, [rawText]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setRawText(e.target.value);
