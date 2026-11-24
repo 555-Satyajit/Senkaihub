@@ -57,11 +57,12 @@ export function CreatePostContainer() {
   const [clanOnly, setClanOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Auto-expand textarea naturally without internal scrollbars
+  // Auto-expand textarea naturally up to a max-height, then scroll internally (just like Instagram)
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${Math.max(100, textareaRef.current.scrollHeight)}px`;
+      const nextHeight = Math.min(180, textareaRef.current.scrollHeight);
+      textareaRef.current.style.height = `${nextHeight}px`;
     }
   }, [rawText]);
 
@@ -145,13 +146,13 @@ export function CreatePostContainer() {
         </div>
       </div>
 
-      {/* Main Studio Area - Seamless borderless canvas on mobile, elevated card on desktop */}
-      <div className="w-full rounded-2xl sm:rounded-[24px] bg-card border border-border/60 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[500px]">
+      {/* Main Studio Area - Instagram fixed aspect ratio window: Image & details lock to identical height */}
+      <div className="w-full rounded-2xl sm:rounded-[24px] bg-card border border-border/60 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 lg:h-[580px] xl:h-[620px]">
         
-        {/* ================= MEDIA CANVAS: Seamless with zero inner padding border on mobile ================= */}
-        <div className="lg:col-span-7 bg-background relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-border/60 min-h-[280px] sm:min-h-[380px] lg:min-h-[540px]">
+        {/* ================= MEDIA CANVAS: Locks to height on desktop ================= */}
+        <div className="lg:col-span-7 bg-background relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-border/60 min-h-[300px] sm:min-h-[400px] lg:h-full overflow-hidden">
           {imageUrl ? (
-            <div className="relative w-full h-full min-h-[280px] sm:min-h-[380px] lg:min-h-[520px] group flex items-center justify-center">
+            <div className="relative w-full h-full min-h-[300px] sm:min-h-[400px] group flex items-center justify-center">
               <Image
                 src={imageUrl}
                 alt="Post preview"
@@ -222,8 +223,8 @@ export function CreatePostContainer() {
           />
         </div>
 
-        {/* ================= DETAILS & CONFIGURATION: Natural auto-expanding layout ================= */}
-        <div className="lg:col-span-5 flex flex-col justify-between p-4 sm:p-6 lg:p-7 gap-4 sm:gap-5">
+        {/* ================= DETAILS & CONFIGURATION: Locked height container with internal smooth scroll ================= */}
+        <div className="lg:col-span-5 flex flex-col justify-between p-5 sm:p-6 lg:p-7 gap-4 lg:h-full lg:overflow-y-auto scrollbar-thin">
           <div className="flex flex-col gap-4">
             
             {/* User Identity Header */}
@@ -321,16 +322,16 @@ export function CreatePostContainer() {
               </Popover>
             </div>
 
-            {/* Natural Borderless Auto-Expanding Caption Area (NO confined scrollbox) */}
+            {/* Instagram Style Caption: Capped height, borderless, scrolls internally without blowing up the window */}
             <div className="flex flex-col relative pt-1">
               <textarea
                 ref={textareaRef}
                 value={rawText}
                 onChange={(e) => setRawText(e.target.value)}
                 placeholder="Write a caption and type #hashtags..."
-                className="w-full bg-transparent border-0 p-0 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 leading-relaxed resize-none overflow-hidden"
+                className="w-full bg-transparent border-0 p-0 text-sm text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-0 leading-relaxed resize-none scrollbar-none max-h-[180px] overflow-y-auto"
               />
-              <div className="flex items-center justify-between text-[11px] text-muted-foreground/60 pt-2 border-t border-border/30 mt-2">
+              <div className="flex items-center justify-between text-[11px] text-muted-foreground/60 pt-2 border-t border-border/30 mt-1">
                 <button
                   type="button"
                   onClick={() => setRawText((prev) => prev + " 🔥")}
