@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { 
@@ -8,19 +8,17 @@ import {
   Send, 
   ShieldAlert, 
   Users, 
-  Hash, 
   Flame, 
   ImageIcon, 
   Eye, 
   MessageCircle, 
   Bookmark, 
   X,
-  Sparkles
+  Swords,
+  Tag
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -34,9 +32,10 @@ import {
 import { Card } from "@/components/ui/card";
 import { SoulShardIcon } from "@/components/icons/soul-shard-icon";
 import { 
-  ANIME_COMMUNITIES, 
-  POST_CATEGORIES, 
-  PostCategory 
+  CLAN_DESTINATIONS, 
+  POST_CLASSIFICATIONS, 
+  PostClassification,
+  POPULAR_TAGS
 } from "../model/create-post-types";
 import { sampleUserProfile } from "@/features/profile/model/profile-types";
 
@@ -44,15 +43,38 @@ export function CreatePostContainer() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const [caption, setCaption] = useState("Solo Leveling Season 2 shadow army composition study. Exploring the contrast between purple soul shadows and fiery crimson battle auras.");
-  const [animeTitle, setAnimeTitle] = useState<string>(ANIME_COMMUNITIES[0]);
-  const [category, setCategory] = useState<PostCategory>("Fan Art");
-  const [imageUrl, setImageUrl] = useState("https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1000&auto=format&fit=crop&q=80");
+  const [rawText, setRawText] = useState(
+    "Solo Leveling Season 2 shadow army composition study. Exploring the contrast between purple soul shadows and fiery crimson battle auras.\n#SoloLeveling #ShadowMonarch #FanArt"
+  );
+  const [selectedClan, setSelectedClan] = useState<string>(CLAN_DESTINATIONS[0]);
+  const [classification, setClassification] = useState<PostClassification>("Fan Art & Illustrations");
+  const [imageUrl, setImageUrl] = useState(
+    "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1000&auto=format&fit=crop&q=80"
+  );
   const [isSpoiler, setIsSpoiler] = useState(false);
-  const [clanExclusive, setClanExclusive] = useState(false);
-  const [tagInput, setTagInput] = useState("");
-  const [tags, setTags] = useState<string[]>(["#SoloLeveling", "#ShadowMonarch", "#FanArt"]);
+  const [clanOnly, setClanOnly] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Automatically parse all hashtags from the text area in real-time
+  const { cleanCaption, extractedTags } = useMemo(() => {
+    const hashtagRegex = /#[a-zA-Z0-9_]+/g;
+    const matches = rawText.match(hashtagRegex) || [];
+    const uniqueTags = Array.from(new Set(matches));
+    
+    // Strip hashtags from the main text body for clean preview display
+    const textWithoutTags = rawText.replace(hashtagRegex, "").trim();
+
+    return {
+      cleanCaption: textWithoutTags || rawText,
+      extractedTags: uniqueTags,
+    };
+  }, [rawText]);
+
+  const handleAddPopularTag = (tag: string) => {
+    if (!rawText.includes(tag)) {
+      setRawText((prev) => (prev ? `${prev.trim()} ${tag}` : tag));
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -67,30 +89,15 @@ export function CreatePostContainer() {
     }
   };
 
-  const handleAddTag = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" || e.key === ",") {
-      e.preventDefault();
-      const cleaned = tagInput.trim().replace(/^#*/, "");
-      if (cleaned && !tags.includes(`#${cleaned}`)) {
-        setTags([...tags, `#${cleaned}`]);
-        setTagInput("");
-      }
-    }
-  };
-
-  const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((t) => t !== tagToRemove));
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!caption.trim() && !imageUrl) return;
+    if (!rawText.trim() && !imageUrl) return;
 
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
       router.push("/feed");
-    }, 500);
+    }, 450);
   };
 
   return (
@@ -98,7 +105,7 @@ export function CreatePostContainer() {
       {/* 2-Column Responsive Studio Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-8 items-start">
         
-        {/* ================= LEFT / MAIN COLUMN: Controls & Creator Studio (7 cols) ================= */}
+        {/* ================= LEFT COLUMN: Publishing Destination & Inputs (7 cols) ================= */}
         <div className="lg:col-span-7 flex flex-col gap-5">
           <div className="bg-card rounded-[24px] border border-border/60 shadow-xl p-5 sm:p-7 flex flex-col gap-5">
             <div>
@@ -107,24 +114,25 @@ export function CreatePostContainer() {
                 <Flame className="w-5 h-5 text-primary" />
               </h2>
               <p className="text-xs sm:text-sm text-muted-foreground mt-1">
-                Configure your artwork, tags, and clan sharing preferences.
+                Choose which Clan banner or Public feed you are contributing to.
               </p>
             </div>
 
-            {/* Anime Series & Classification */}
+            {/* Posting Destination: Clan vs Category */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
-                <Label htmlFor="anime-select" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Anime Community
+                <Label htmlFor="clan-select" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Swords className="w-3.5 h-3.5 text-primary" />
+                  <span>Posting To (Clan / Feed)</span>
                 </Label>
-                <Select value={animeTitle} onValueChange={(val) => val && setAnimeTitle(val)}>
-                  <SelectTrigger id="anime-select" className="w-full bg-secondary/60 border-border/70 h-11 rounded-xl">
-                    <SelectValue placeholder="Select anime series" />
+                <Select value={selectedClan} onValueChange={(val) => val && setSelectedClan(val)}>
+                  <SelectTrigger id="clan-select" className="w-full bg-secondary/50 border-border/70 h-11 rounded-xl cursor-pointer">
+                    <SelectValue placeholder="Select Clan destination" />
                   </SelectTrigger>
-                  <SelectContent className="bg-card border-border/80 max-h-60">
-                    {ANIME_COMMUNITIES.map((anime) => (
-                      <SelectItem key={anime} value={anime}>
-                        {anime}
+                  <SelectContent className="bg-card border-border/80 max-h-64">
+                    {CLAN_DESTINATIONS.map((clan) => (
+                      <SelectItem key={clan} value={clan} className="cursor-pointer">
+                        {clan}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -132,16 +140,17 @@ export function CreatePostContainer() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <Label htmlFor="category-select" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                  Post Category
+                <Label htmlFor="classification-select" className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                  <Tag className="w-3.5 h-3.5 text-accent" />
+                  <span>Post Classification</span>
                 </Label>
-                <Select value={category} onValueChange={(val) => val && setCategory(val as PostCategory)}>
-                  <SelectTrigger id="category-select" className="w-full bg-secondary/60 border-border/70 h-11 rounded-xl">
-                    <SelectValue placeholder="Select category" />
+                <Select value={classification} onValueChange={(val) => val && setClassification(val as PostClassification)}>
+                  <SelectTrigger id="classification-select" className="w-full bg-secondary/50 border-border/70 h-11 rounded-xl cursor-pointer">
+                    <SelectValue placeholder="Select classification" />
                   </SelectTrigger>
                   <SelectContent className="bg-card border-border/80">
-                    {POST_CATEGORIES.map((cat) => (
-                      <SelectItem key={cat} value={cat}>
+                    {POST_CLASSIFICATIONS.map((cat) => (
+                      <SelectItem key={cat} value={cat} className="cursor-pointer">
                         {cat}
                       </SelectItem>
                     ))}
@@ -209,37 +218,60 @@ export function CreatePostContainer() {
               />
             </div>
 
-            {/* Caption Textarea */}
+            {/* Caption Textarea with Natural Hashtag Typing */}
             <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="caption-input" className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Post Caption & Tags
+                </Label>
+                <span className="text-[11px] text-muted-foreground">
+                  Type <span className="text-primary font-bold">#tag</span> anywhere in text
+                </span>
+              </div>
               <textarea
                 id="caption-input"
-                rows={3}
-                value={caption}
-                onChange={(e) => setCaption(e.target.value)}
-                placeholder="Write caption, anime context, or add #hashtags directly..."
+                rows={4}
+                value={rawText}
+                onChange={(e) => setRawText(e.target.value)}
+                placeholder="Write your anime thoughts, raid notes, and tag #Series #Art..."
                 className="w-full rounded-2xl bg-secondary/40 border border-border/60 p-4 text-sm text-foreground placeholder:text-muted-foreground/60 resize-none focus:outline-none focus:border-border/90 transition-all leading-relaxed"
               />
             </div>
 
-            {/* Quick Tag Pills Row (Tap to insert directly into caption) */}
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
-                <Hash className="w-3 h-3" /> Popular:
-              </span>
-              {["#SoloLeveling", "#FanArt", "#DemonSlayer", "#JJK", "#MangaTheory"].map((tag) => (
-                <button
-                  key={tag}
-                  type="button"
-                  onClick={() => {
-                    if (!caption.includes(tag)) {
-                      setCaption((prev) => (prev ? `${prev} ${tag}` : tag));
-                    }
-                  }}
-                  className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/50 transition-colors cursor-pointer"
-                >
-                  {tag}
-                </button>
-              ))}
+            {/* Red Hashtag Badges extracted in real time */}
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] font-semibold text-muted-foreground">Detected Tags:</span>
+                {extractedTags.length > 0 ? (
+                  extractedTags.map((tag) => (
+                    <span 
+                      key={tag} 
+                      className="px-2 py-0.5 rounded-md text-xs font-bold text-primary bg-primary/10 border border-primary/20"
+                    >
+                      {tag}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-xs text-muted-foreground/60 italic">
+                    No hashtags yet (type #hashtag in caption or click below)
+                  </span>
+                )}
+              </div>
+
+              {/* Quick Tag Pills */}
+              <div className="flex items-center gap-1.5 flex-wrap pt-1">
+                <span className="text-[11px] text-muted-foreground/80">Add quick:</span>
+                {POPULAR_TAGS.map((tag) => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => handleAddPopularTag(tag)}
+                    className="px-2 py-0.5 rounded-full text-[11px] font-semibold bg-secondary/70 hover:bg-secondary text-muted-foreground hover:text-foreground border border-border/50 transition-colors cursor-pointer"
+                  >
+                    + {tag}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Clean Minimal Protective Options */}
@@ -259,12 +291,12 @@ export function CreatePostContainer() {
               <label htmlFor="clan-toggle" className="flex items-center gap-2 cursor-pointer select-none">
                 <Switch
                   id="clan-toggle"
-                  checked={clanExclusive}
-                  onCheckedChange={setClanExclusive}
+                  checked={clanOnly}
+                  onCheckedChange={setClanOnly}
                 />
                 <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <Users className="w-3.5 h-3.5 text-muted-foreground" />
-                  Clan Exclusive
+                  Clan Vault Only
                 </span>
               </label>
             </div>
@@ -282,7 +314,7 @@ export function CreatePostContainer() {
               <Button
                 type="button"
                 onClick={handleSubmit}
-                disabled={isSubmitting || (!caption.trim() && !imageUrl)}
+                disabled={isSubmitting || (!rawText.trim() && !imageUrl)}
                 className="h-10 px-6 rounded-xl font-heading font-bold text-xs sm:text-sm text-primary-foreground shadow-lg shadow-primary/25 gap-2 border-0 hover:brightness-110 cursor-pointer disabled:opacity-40"
                 style={{ background: "var(--gradient-btn)" }}
               >
@@ -328,7 +360,7 @@ export function CreatePostContainer() {
                   </div>
 
                   <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
-                    <span className="font-medium text-foreground/80">{animeTitle}</span>
+                    <span className="font-medium text-foreground/80">{selectedClan}</span>
                     <span>•</span>
                     <span>Just now</span>
                   </div>
@@ -336,7 +368,7 @@ export function CreatePostContainer() {
               </div>
 
               <Badge variant="secondary" className="text-[10px] font-semibold border-border">
-                {category}
+                {classification}
               </Badge>
             </div>
 
@@ -356,7 +388,7 @@ export function CreatePostContainer() {
                     <span className="text-[10px] text-muted-foreground">Tap to view hidden content</span>
                   </div>
                 )}
-                {clanExclusive && (
+                {clanOnly && (
                   <div className="absolute top-2.5 left-2.5">
                     <Badge className="bg-background/80 backdrop-blur-md text-accent border border-accent/40 text-[10px] font-bold">
                       Clan Vault Only
@@ -371,16 +403,16 @@ export function CreatePostContainer() {
               </div>
             )}
 
-            {/* Caption & Tags */}
+            {/* Caption & Red Hashtags in Live Card */}
             <div className="flex flex-col gap-2">
               <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed break-words">
-                {caption || "Your post description will appear here..."}
+                {cleanCaption || "Your post description will appear here..."}
               </p>
 
-              {tags.length > 0 && (
+              {extractedTags.length > 0 && (
                 <div className="flex flex-wrap gap-1.5">
-                  {tags.map((tag) => (
-                    <span key={tag} className="text-xs font-semibold text-primary">
+                  {extractedTags.map((tag) => (
+                    <span key={tag} className="text-xs font-bold text-primary hover:underline cursor-pointer">
                       {tag}
                     </span>
                   ))}

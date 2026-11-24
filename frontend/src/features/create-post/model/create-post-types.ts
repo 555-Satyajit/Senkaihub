@@ -1,33 +1,44 @@
-export type PostCategory = "Fan Art" | "Cosplay" | "Anime Discussion" | "Manga Chapter" | "Theory" | "AMV / Edit";
+export type PostClassification = 
+  | "Fan Art & Illustrations" 
+  | "Clan Raid Strategy" 
+  | "Manga & Theory" 
+  | "Cosplay Showcase" 
+  | "Battle Clips / AMV";
 
 export interface CreatePostPayload {
   caption: string;
-  category: PostCategory;
-  animeTitle: string;
+  clanName: string;
+  classification: PostClassification;
   tags: string[];
   imageUrl: string;
   isSpoiler: boolean;
-  spoilerEpisode?: string;
-  clanExclusive: boolean;
+  clanOnly: boolean;
 }
 
-export const ANIME_COMMUNITIES = [
-  "Solo Leveling",
-  "Demon Slayer (Kimetsu no Yaiba)",
-  "Jujutsu Kaisen",
-  "One Piece",
-  "Chainsaw Man",
-  "Attack on Titan",
-  "Bleach: Thousand-Year Blood War",
-  "Frieren: Beyond Journey's End",
-  "Naruto / Boruto",
+export const CLAN_DESTINATIONS = [
+  "Public Feed (All Clans)",
+  "Shadow Monarchs",
+  "Demon Slayer Corps",
+  "Jujutsu Sorcerers",
+  "Straw Hat Fleet",
+  "Akatsuki Renegades",
+  "Survey Corps Legion",
 ] as const;
 
-export const POST_CATEGORIES: PostCategory[] = [
-  "Fan Art",
-  "Cosplay",
-  "Anime Discussion",
-  "Manga Chapter",
-  "Theory",
-  "AMV / Edit",
+export const POST_CLASSIFICATIONS: PostClassification[] = [
+  "Fan Art & Illustrations",
+  "Clan Raid Strategy",
+  "Manga & Theory",
+  "Cosplay Showcase",
+  "Battle Clips / AMV",
+];
+
+export const POPULAR_TAGS = [
+  "#SoloLeveling",
+  "#DemonSlayer",
+  "#JJK",
+  "#OnePiece",
+  "#ClanWars",
+  "#FanArt",
+  "#RaidStrategy",
 ];
