@@ -55,6 +55,7 @@ export function CreatePostContainer() {
   const [selectedClan, setSelectedClan] = useState<string>(CLAN_DESTINATIONS[0]);
   const [openClanCombobox, setOpenClanCombobox] = useState(false);
   const [classification, setClassification] = useState<PostClassification>("Fan Art & Illustrations");
+  const [openCategoryCombobox, setOpenCategoryCombobox] = useState(false);
   const [imageUrl, setImageUrl] = useState(
     "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1000&auto=format&fit=crop&q=80"
   );
@@ -229,18 +230,17 @@ export function CreatePostContainer() {
               </div>
             </div>
 
-            {/* Destination & Category Selector Pills */}
-            <div className="flex flex-wrap items-center gap-2 pt-1">
-              {/* Searchable Shadcn Command Popover for Clan Selection */}
+            {/* Clan Destination & Post Category Selectors (Single Clean Row) */}
+            <div className="flex items-center gap-2 pt-0.5">
+              {/* 1. Searchable Shadcn Command Popover for Clan Destination */}
               <Popover open={openClanCombobox} onOpenChange={setOpenClanCombobox}>
                 <PopoverTrigger
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
                 >
-                  <Swords className="w-3.5 h-3.5 text-primary" />
                   <span className="truncate max-w-[140px]">{selectedClan}</span>
-                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
+                  <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </PopoverTrigger>
-                <PopoverContent align="start" className="w-[260px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
+                <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
                   <Command className="bg-transparent">
                     <CommandInput placeholder="Search Clan..." className="h-9 text-xs" />
                     <CommandList className="max-h-56 no-scrollbar p-1">
@@ -270,27 +270,43 @@ export function CreatePostContainer() {
                 </PopoverContent>
               </Popover>
 
-              {/* Classification dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+              {/* 2. Searchable Shadcn Command Popover for Post Category */}
+              <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
+                <PopoverTrigger
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
                 >
-                  <Sparkles className="w-3.5 h-3.5 text-accent" />
-                  <span>{classification}</span>
-                  <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card border-border/70 shadow-xl rounded-xl">
-                  {POST_CLASSIFICATIONS.map((cat) => (
-                    <DropdownMenuItem
-                      key={cat}
-                      onClick={() => setClassification(cat)}
-                      className="text-xs font-medium cursor-pointer"
-                    >
-                      {cat}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <span className="truncate max-w-[140px]">{classification}</span>
+                  <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
+                  <Command className="bg-transparent">
+                    <CommandInput placeholder="Search Category..." className="h-9 text-xs" />
+                    <CommandList className="max-h-56 no-scrollbar p-1">
+                      <CommandEmpty className="text-xs text-muted-foreground py-4 text-center">
+                        No category found.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {POST_CLASSIFICATIONS.map((cat) => (
+                          <CommandItem
+                            key={cat}
+                            value={cat}
+                            onSelect={() => {
+                              setClassification(cat);
+                              setOpenCategoryCombobox(false);
+                            }}
+                            className="text-xs font-medium cursor-pointer rounded-lg px-2.5 py-1.5 hover:bg-secondary text-foreground flex items-center justify-between"
+                          >
+                            <span>{cat}</span>
+                            {classification === cat && (
+                              <Check className="w-3.5 h-3.5 text-primary ml-auto" />
+                            )}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Caption Textarea with scrollbar styling */}
