@@ -8,6 +8,13 @@ export const metadata: Metadata = {
   description: "Join clans, unlock progress-gated spoiler vaults, and compete in Clan Wars.",
 };
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  viewportFit: "cover",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{

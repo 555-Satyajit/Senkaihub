@@ -111,7 +111,7 @@ export function ChatContainer({ onMobileChatOpenChange }: ChatContainerProps) {
         </div>
 
         {/* Conversation List with scroll-fade */}
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 sm:p-4 space-y-2.5 custom-scrollbar scroll-fade-b pb-16 md:pb-6 touch-pan-y">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3 sm:p-4 space-y-2.5 custom-scrollbar scroll-fade-b pb-16 md:pb-6 touch-pan-y [-webkit-overflow-scrolling:touch]">
           {filteredConversations.map((conv) => (
             <ChatListItem
               key={conv.id}
@@ -136,7 +136,7 @@ export function ChatContainer({ onMobileChatOpenChange }: ChatContainerProps) {
         />
 
         {/* Message Stream */}
-        <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y scroll-fade-y custom-scrollbar">
+        <div className="flex-1 min-h-0 w-full overflow-y-auto overscroll-contain touch-pan-y scroll-fade-y custom-scrollbar [-webkit-overflow-scrolling:touch]">
           <div className="w-full max-w-3xl mx-auto p-4 sm:p-6 space-y-4">
             {activeChat.messages.map((msg) => (
               <ChatMessageBubble key={msg.id} message={msg} />
