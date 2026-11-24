@@ -8,12 +8,11 @@ import {
   ShieldAlert, 
   Users, 
   X, 
-  ArrowLeft,
   ChevronDown,
-  Sparkles,
-  Swords,
   Smile,
-  Check
+  Check,
+  Flame,
+  Send
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -31,12 +30,6 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { 
   CLAN_DESTINATIONS, 
   POST_CLASSIFICATIONS, 
@@ -107,41 +100,49 @@ export function CreatePostContainer() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-card">
-      {/* 1. Full-Bleed Top Navigation Bar */}
-      <header className="h-[64px] md:h-[72px] px-4 sm:px-6 md:px-8 border-b border-border/50 flex items-center justify-between bg-card shrink-0 z-20">
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="w-10 h-10 rounded-xl bg-secondary/80 hover:bg-secondary text-foreground border border-border/60 flex items-center justify-center transition-colors cursor-pointer"
-            aria-label="Cancel and return to feed"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-          <span className="font-heading font-black text-base sm:text-lg text-foreground">
-            Create new post
-          </span>
+    <div className="w-full flex flex-col gap-6">
+      {/* Studio Card Header */}
+      <div className="flex items-center justify-between pb-4 border-b border-border/40">
+        <div>
+          <h1 className="font-heading font-black text-xl sm:text-2xl text-foreground flex items-center gap-2">
+            <span>Publish Post</span>
+            <Flame className="w-5 h-5 text-primary" />
+          </h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">
+            Share original artwork, chapter theories, or raid strategies to your Clan.
+          </p>
         </div>
 
-        <Button
-          type="button"
-          onClick={handleSubmit}
-          disabled={isSubmitting || (!rawText.trim() && !imageUrl)}
-          className="h-10 px-6 rounded-xl font-heading font-bold text-xs sm:text-sm text-primary-foreground shadow-md hover:brightness-110 border-0 cursor-pointer disabled:opacity-40"
-          style={{ background: "var(--gradient-btn)" }}
-        >
-          {isSubmitting ? "Sharing..." : "Share"}
-        </Button>
-      </header>
+        <div className="flex items-center gap-3">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => router.back()}
+            className="rounded-xl text-xs font-semibold px-4 cursor-pointer text-muted-foreground hover:text-foreground"
+          >
+            Cancel
+          </Button>
 
-      {/* 2. Full-Page Split Screen Body: Left Media Canvas, Right Details Panel */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-12 min-h-0 overflow-y-auto md:overflow-hidden">
+          <Button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting || (!rawText.trim() && !imageUrl)}
+            className="h-10 px-6 rounded-xl font-heading font-bold text-xs sm:text-sm text-primary-foreground shadow-md hover:brightness-110 border-0 cursor-pointer disabled:opacity-40"
+            style={{ background: "var(--gradient-btn)" }}
+          >
+            <Send className="w-4 h-4 mr-1.5" />
+            <span>{isSubmitting ? "Publishing..." : "Publish"}</span>
+          </Button>
+        </div>
+      </div>
+
+      {/* Main Studio Card Container matching globals.css bg-card */}
+      <div className="w-full bg-card rounded-[24px] border border-border/60 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[520px]">
         
-        {/* ================= LEFT FULL-HEIGHT MEDIA VIEWPORT (7 cols) ================= */}
-        <div className="md:col-span-7 bg-black/60 relative flex items-center justify-center border-b md:border-b-0 md:border-r border-border/50 min-h-[320px] md:h-full overflow-hidden">
+        {/* ================= LEFT COLUMN: Media Canvas (Identical to bg-background) ================= */}
+        <div className="lg:col-span-7 bg-background relative flex items-center justify-center border-b lg:border-b-0 lg:border-r border-border/60 min-h-[340px] lg:min-h-[540px] p-4">
           {imageUrl ? (
-            <div className="relative w-full h-full min-h-[320px] group flex items-center justify-center">
+            <div className="relative w-full h-full min-h-[340px] lg:min-h-[500px] rounded-2xl overflow-hidden border border-border/50 group flex items-center justify-center bg-black/20">
               <Image
                 src={imageUrl}
                 alt="Post preview"
@@ -159,18 +160,18 @@ export function CreatePostContainer() {
               )}
 
               {/* Change / Remove media floating pill */}
-              <div className="absolute bottom-5 left-5 right-5 flex items-center justify-between z-20">
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between z-20">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="px-4 py-2 rounded-full bg-black/80 hover:bg-black text-white text-xs font-semibold backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-xl"
+                  className="px-4 py-2 rounded-full bg-card/90 hover:bg-card text-foreground text-xs font-semibold backdrop-blur-md border border-border/80 transition-all cursor-pointer shadow-xl"
                 >
                   Change Photo
                 </button>
                 <button
                   type="button"
                   onClick={() => setImageUrl("")}
-                  className="w-9 h-9 rounded-full bg-black/80 hover:bg-black text-white flex items-center justify-center backdrop-blur-md border border-white/20 transition-all cursor-pointer shadow-xl"
+                  className="w-9 h-9 rounded-full bg-card/90 hover:bg-card text-foreground flex items-center justify-center backdrop-blur-md border border-border/80 transition-all cursor-pointer shadow-xl"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -179,12 +180,12 @@ export function CreatePostContainer() {
           ) : (
             <div 
               onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-3 p-8 text-center cursor-pointer select-none group w-full h-full"
+              className="flex flex-col items-center justify-center gap-3 p-8 text-center cursor-pointer select-none group w-full h-full rounded-2xl border-2 border-dashed border-border/70 hover:border-border transition-all"
             >
-              <div className="w-18 h-18 rounded-2xl bg-secondary border border-border/80 flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:scale-105 transition-all shadow-md">
-                <UploadCloud className="w-9 h-9 stroke-[1.8]" />
+              <div className="w-16 h-16 rounded-2xl bg-secondary border border-border/80 flex items-center justify-center text-muted-foreground group-hover:text-primary group-hover:scale-105 transition-all shadow-md">
+                <UploadCloud className="w-8 h-8 stroke-[1.8]" />
               </div>
-              <p className="font-heading font-semibold text-base text-foreground">
+              <p className="font-heading font-semibold text-sm text-foreground">
                 Select anime artwork or photos
               </p>
               <span className="text-xs text-muted-foreground max-w-xs">
@@ -194,7 +195,7 @@ export function CreatePostContainer() {
                 type="button"
                 variant="outline"
                 size="sm"
-                className="rounded-xl mt-2 text-xs font-semibold pointer-events-none"
+                className="rounded-xl mt-2 text-xs font-semibold pointer-events-none border-border"
               >
                 Select from device
               </Button>
@@ -210,8 +211,8 @@ export function CreatePostContainer() {
           />
         </div>
 
-        {/* ================= RIGHT FULL-HEIGHT DETAILS PANEL (5 cols) ================= */}
-        <div className="md:col-span-5 flex flex-col justify-between bg-card p-6 md:p-8 gap-5 overflow-y-auto">
+        {/* ================= RIGHT COLUMN: Author & Post Configuration ================= */}
+        <div className="lg:col-span-5 flex flex-col justify-between p-6 sm:p-7 gap-5">
           <div className="flex flex-col gap-5">
             
             {/* User Identity Header */}
@@ -235,9 +236,9 @@ export function CreatePostContainer() {
               {/* 1. Searchable Shadcn Command Popover for Clan Destination */}
               <Popover open={openClanCombobox} onOpenChange={setOpenClanCombobox}>
                 <PopoverTrigger
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
                 >
-                  <span className="truncate max-w-[140px]">{selectedClan}</span>
+                  <span className="truncate max-w-[130px]">{selectedClan}</span>
                   <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
@@ -273,9 +274,9 @@ export function CreatePostContainer() {
               {/* 2. Searchable Shadcn Command Popover for Post Category */}
               <Popover open={openCategoryCombobox} onOpenChange={setOpenCategoryCombobox}>
                 <PopoverTrigger
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-xs font-semibold text-foreground border border-border/70 transition-colors cursor-pointer"
                 >
-                  <span className="truncate max-w-[140px]">{classification}</span>
+                  <span className="truncate max-w-[130px]">{classification}</span>
                   <ChevronDown className="w-3 h-3 text-muted-foreground shrink-0" />
                 </PopoverTrigger>
                 <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
@@ -312,7 +313,7 @@ export function CreatePostContainer() {
             {/* Caption Textarea with scrollbar styling */}
             <div className="flex flex-col gap-1 relative">
               <textarea
-                rows={6}
+                rows={5}
                 value={rawText}
                 onChange={(e) => setRawText(e.target.value)}
                 placeholder="Write a caption and type #hashtags..."
