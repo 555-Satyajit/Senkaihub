@@ -99,78 +99,65 @@ export function ProfileShowcaseTabs({ posts, achievements }: ProfileShowcaseTabs
         </div>
       )}
 
-      {/* 2. Clan War Trophies & Achievements Display - Hexagonal Trophy Cabinet / Medallion Showcase */}
+      {/* 2. Clan War Trophies & Achievements Display - Collectible Badges Grid (Reddit / Trailhead style) */}
       {activeTab === "achievements" && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6 py-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 py-2">
           {achievements.map((ach) => {
             const isCrimson = ach.tier === "Crimson";
             const isDiamond = ach.tier === "Diamond";
-            const isGold = ach.tier === "Gold";
 
-            const glowColor = isCrimson
-              ? "shadow-[0_0_24px_-4px_rgba(239,68,68,0.35)] border-primary/50 group-hover:border-primary"
+            // Authentic badge palette & embroidered stitch borders
+            const badgeBg = isCrimson
+              ? "bg-gradient-to-b from-red-500/20 to-red-950/40 text-primary border-red-500/40 ring-red-500/20 shadow-red-500/10"
               : isDiamond
-              ? "shadow-[0_0_24px_-4px_rgba(34,211,238,0.35)] border-cyan-400/50 group-hover:border-cyan-400"
-              : "shadow-[0_0_24px_-4px_rgba(245,158,11,0.35)] border-accent/50 group-hover:border-accent";
+              ? "bg-gradient-to-b from-cyan-400/20 to-cyan-950/40 text-cyan-400 border-cyan-400/40 ring-cyan-400/20 shadow-cyan-400/10"
+              : "bg-gradient-to-b from-amber-400/20 to-amber-950/40 text-amber-400 border-amber-400/40 ring-amber-400/20 shadow-amber-400/10";
 
-            const hexBg = isCrimson
-              ? "from-primary/20 via-primary/5 to-transparent text-primary"
+            const tierColor = isCrimson
+              ? "text-primary bg-primary/10 border-primary/30"
               : isDiamond
-              ? "from-cyan-400/20 via-cyan-400/5 to-transparent text-cyan-400"
-              : "from-accent/20 via-accent/5 to-transparent text-accent";
-
-            const badgePill = isCrimson
-              ? "bg-primary/20 text-primary border-primary/40"
-              : isDiamond
-              ? "bg-cyan-400/20 text-cyan-400 border-cyan-400/40"
-              : "bg-accent/20 text-accent border-accent/40";
+              ? "text-cyan-400 bg-cyan-400/10 border-cyan-400/30"
+              : "text-amber-400 bg-amber-400/10 border-amber-400/30";
 
             return (
               <div
                 key={ach.id}
-                className="group relative flex flex-col items-center text-center p-5 rounded-2xl bg-gradient-to-b from-card to-card/60 border border-border/60 hover:border-border transition-all duration-300 hover:-translate-y-1.5 cursor-pointer shadow-lg overflow-hidden select-none"
+                className="group flex flex-col items-center text-center p-4 rounded-2xl bg-card border border-border/50 hover:border-border transition-all duration-200 hover:-translate-y-1 hover:shadow-lg select-none cursor-pointer"
               >
-                {/* Background ambient radial glow */}
-                <div
-                  className={`absolute -top-12 -left-12 w-28 h-28 rounded-full blur-2xl pointer-events-none opacity-20 group-hover:opacity-40 transition-opacity ${
-                    isCrimson ? "bg-primary" : isDiamond ? "bg-cyan-400" : "bg-accent"
-                  }`}
-                />
-
-                {/* Hexagonal Medal Emblemed Container */}
-                <div className="relative my-2">
+                {/* Physical Collectible Circular Patch / Shield Badge */}
+                <div className="relative mb-3">
+                  {/* Outer stitched ring */}
                   <div
-                    className={`w-20 h-20 rounded-2xl rotate-45 flex items-center justify-center border-2 bg-gradient-to-br ${hexBg} ${glowColor} transition-all duration-300 group-hover:rotate-0 group-hover:scale-105`}
+                    className={`w-18 h-18 rounded-full flex items-center justify-center border-2 border-dashed ring-4 ring-offset-2 ring-offset-card transition-transform duration-300 group-hover:scale-110 shadow-lg ${badgeBg}`}
                   >
-                    <div className="-rotate-45 group-hover:rotate-0 transition-transform duration-300">
+                    {/* Inner embroidered medal shield */}
+                    <div className="w-13 h-13 rounded-full bg-card/80 flex items-center justify-center border border-current shadow-inner">
                       {renderIcon(ach.iconType)}
                     </div>
                   </div>
                 </div>
 
-                {/* Tier Ribbon */}
-                <div className="mt-4 mb-1.5">
-                  <span
-                    className={`text-[9px] font-black tracking-widest uppercase px-2.5 py-0.5 rounded-full border ${badgePill}`}
-                  >
-                    {ach.tier} RANK
-                  </span>
-                </div>
-
-                {/* Trophy Title */}
-                <h3 className="font-heading font-bold text-xs sm:text-sm text-foreground line-clamp-1 mt-1 group-hover:text-primary transition-colors">
+                {/* Badge Title */}
+                <h3 className="font-heading font-bold text-xs sm:text-sm text-foreground line-clamp-1 group-hover:text-primary transition-colors">
                   {ach.title}
                 </h3>
 
-                {/* Lore / Description */}
-                <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1.5 leading-relaxed">
+                {/* Description */}
+                <p className="text-[11px] text-muted-foreground line-clamp-2 mt-1 leading-snug">
                   {ach.description}
                 </p>
 
-                {/* Unlocked date footer */}
-                <span className="text-[9px] font-semibold text-muted-foreground/60 mt-3 pt-2 border-t border-border/40 w-full">
-                  Unlocked {ach.unlockedAt}
-                </span>
+                {/* Bottom Tier Stamp */}
+                <div className="mt-3 flex items-center gap-1.5">
+                  <span
+                    className={`text-[9px] font-bold px-2 py-0.5 rounded-full border uppercase tracking-wider ${tierColor}`}
+                  >
+                    {ach.tier}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground/60 font-medium">
+                    · {ach.unlockedAt}
+                  </span>
+                </div>
               </div>
             );
           })}
