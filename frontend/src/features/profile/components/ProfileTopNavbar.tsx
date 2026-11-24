@@ -1,8 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Share2, MoreHorizontal } from "lucide-react";
+import { Share2, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProfileTopNavbarProps {
@@ -11,22 +9,10 @@ interface ProfileTopNavbarProps {
 }
 
 export function ProfileTopNavbar({ name, handle }: ProfileTopNavbarProps) {
-  const router = useRouter();
-
   return (
     <header className="h-[64px] md:h-[76px] bg-background/90 backdrop-blur-md px-4 sm:px-6 md:px-8 flex items-center justify-between sticky top-0 z-30 border-b border-border/40">
-      {/* Left: Back button + Profile Name & Handle */}
+      {/* Left: Profile Name & Handle */}
       <div className="flex items-center gap-3.5">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => router.back()}
-          aria-label="Go back"
-          className="w-10 h-10 rounded-xl bg-card hover:bg-secondary text-foreground border border-border/60 transition-all cursor-pointer"
-        >
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-
         <div>
           <h1 className="font-heading font-bold text-base md:text-lg text-foreground leading-tight">
             {name}
