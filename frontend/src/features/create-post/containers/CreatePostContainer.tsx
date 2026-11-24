@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { 
   UploadCloud, 
-  Send, 
   ShieldAlert, 
   Users, 
   X, 
@@ -14,11 +13,24 @@ import {
   Sparkles,
   Swords,
   Smile,
-  Hash
+  Check
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +53,7 @@ export function CreatePostContainer() {
     "Solo Leveling Season 2 shadow army composition study. Exploring the contrast between purple soul shadows and fiery crimson battle auras.\n#SoloLeveling #ShadowMonarch #FanArt"
   );
   const [selectedClan, setSelectedClan] = useState<string>(CLAN_DESTINATIONS[0]);
+  const [openClanCombobox, setOpenClanCombobox] = useState(false);
   const [classification, setClassification] = useState<PostClassification>("Fan Art & Illustrations");
   const [imageUrl, setImageUrl] = useState(
     "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=1000&auto=format&fit=crop&q=80"
@@ -220,38 +233,55 @@ export function CreatePostContainer() {
 
               {/* Destination & Category Selector Pills */}
               <div className="flex flex-wrap items-center gap-2 pt-1">
-                {/* Clan destination dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/70 hover:bg-secondary text-xs font-semibold text-foreground border border-border/60 transition-colors cursor-pointer"
+                {/* Searchable Shadcn Command Popover for Clan Selection */}
+                <Popover open={openClanCombobox} onOpenChange={setOpenClanCombobox}>
+                  <PopoverTrigger
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/70 hover:bg-secondary text-xs font-semibold text-foreground border border-border/60 transition-colors cursor-pointer"
                   >
                     <Swords className="w-3.5 h-3.5 text-primary" />
                     <span className="truncate max-w-[130px]">{selectedClan}</span>
                     <ChevronDown className="w-3 h-3 text-muted-foreground" />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-card border-border/70 max-h-56">
-                    {CLAN_DESTINATIONS.map((clan) => (
-                      <DropdownMenuItem
-                        key={clan}
-                        onClick={() => setSelectedClan(clan)}
-                        className="text-xs font-medium cursor-pointer"
-                      >
-                        {clan}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[240px] p-0 bg-card border-border/70 shadow-2xl rounded-xl overflow-hidden">
+                    <Command className="bg-transparent">
+                      <CommandInput placeholder="Search Clan..." className="h-9 text-xs" />
+                      <CommandList className="max-h-56 no-scrollbar p-1">
+                        <CommandEmpty className="text-xs text-muted-foreground py-4 text-center">
+                          No Clan found.
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {CLAN_DESTINATIONS.map((clan) => (
+                            <CommandItem
+                              key={clan}
+                              value={clan}
+                              onSelect={() => {
+                                setSelectedClan(clan);
+                                setOpenClanCombobox(false);
+                              }}
+                              className="text-xs font-medium cursor-pointer rounded-lg px-2.5 py-1.5 hover:bg-secondary text-foreground flex items-center justify-between"
+                            >
+                              <span>{clan}</span>
+                              {selectedClan === clan && (
+                                <Check className="w-3.5 h-3.5 text-primary ml-auto" />
+                              )}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
 
                 {/* Classification dropdown */}
                 <DropdownMenu>
                   <DropdownMenuTrigger
-                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary/70 hover:bg-secondary text-xs font-semibold text-foreground border border-border/60 transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary/70 hover:bg-secondary text-xs font-semibold text-foreground border border-border/60 transition-colors cursor-pointer"
                   >
                     <Sparkles className="w-3.5 h-3.5 text-accent" />
                     <span>{classification}</span>
                     <ChevronDown className="w-3 h-3 text-muted-foreground" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="start" className="bg-card border-border/70">
+                  <DropdownMenuContent align="start" className="bg-card border-border/70 shadow-xl rounded-xl">
                     {POST_CLASSIFICATIONS.map((cat) => (
                       <DropdownMenuItem
                         key={cat}
