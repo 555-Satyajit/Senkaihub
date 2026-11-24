@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { MessageCircle, Eye, Sparkles } from "lucide-react";
+import { MessageCircle, Eye } from "lucide-react";
 import { PostItem } from "@/features/feed/model/feed-types";
 import { SoulShardIcon } from "@/components/icons/soul-shard-icon";
-import { Badge } from "@/components/ui/badge";
 
 interface ProfilePostGridItemProps {
   post: PostItem;
@@ -21,14 +20,6 @@ export function ProfilePostGridItem({ post }: ProfilePostGridItemProps) {
         sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         className="object-cover group-hover:scale-105 transition-transform duration-300"
       />
-
-      {/* Top Category Badge (Always visible, subtle) */}
-      <div className="absolute top-2.5 right-2.5 z-10">
-        <Badge className="bg-background/70 backdrop-blur-md text-[10px] font-semibold text-foreground border border-border/50 px-2 py-0.5 gap-1">
-          <Sparkles className="w-2.5 h-2.5 text-accent" />
-          <span>{post.category}</span>
-        </Badge>
-      </div>
 
       {/* Hover Overlay: Dark Glass with Soul Shards and Comments */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-3.5 z-20">
