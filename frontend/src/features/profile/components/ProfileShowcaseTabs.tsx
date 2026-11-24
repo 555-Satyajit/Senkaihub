@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Image as ImageIcon, Trophy, Award, Flame, Shield, Swords, Plus, Grid3X3, List } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Image as ImageIcon, Trophy, Award, Flame, Shield, Swords, Grid3X3, List } from "lucide-react";
 import { ClanAchievement } from "../model/profile-types";
 import { PostItem } from "@/features/feed/model/feed-types";
 import { FeedPostCard } from "@/features/feed/components/FeedPostCard";
@@ -36,14 +35,14 @@ export function ProfileShowcaseTabs({ posts, achievements }: ProfileShowcaseTabs
   return (
     <div className="w-full flex flex-col gap-5">
       {/* Tab Controls Bar */}
-      <div className="flex items-center justify-between border-b border-border/40 pb-2 gap-2">
-        <div className="flex items-center gap-3 sm:gap-6 min-w-0">
+      <div className="flex items-center justify-between border-b border-border/40 gap-2">
+        <div className="flex items-center gap-4 sm:gap-6 min-w-0">
           <button
             type="button"
             onClick={() => setActiveTab("posts")}
-            className={`flex items-center gap-1.5 sm:gap-2 pb-2 text-xs sm:text-[14px] font-bold tracking-tight transition-all relative cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 sm:gap-2 pb-2.5 text-xs sm:text-[14px] font-bold tracking-tight transition-all relative cursor-pointer shrink-0 ${
               activeTab === "posts"
-                ? "text-primary border-b-2 border-primary -mb-[10px]"
+                ? "text-primary border-b-2 border-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -56,9 +55,9 @@ export function ProfileShowcaseTabs({ posts, achievements }: ProfileShowcaseTabs
           <button
             type="button"
             onClick={() => setActiveTab("achievements")}
-            className={`flex items-center gap-1.5 sm:gap-2 pb-2 text-xs sm:text-[14px] font-bold tracking-tight transition-all relative cursor-pointer shrink-0 ${
+            className={`flex items-center gap-1.5 sm:gap-2 pb-2.5 text-xs sm:text-[14px] font-bold tracking-tight transition-all relative cursor-pointer shrink-0 ${
               activeTab === "achievements"
-                ? "text-primary border-b-2 border-primary -mb-[10px]"
+                ? "text-primary border-b-2 border-primary"
                 : "text-muted-foreground hover:text-foreground"
             }`}
           >
@@ -69,46 +68,35 @@ export function ProfileShowcaseTabs({ posts, achievements }: ProfileShowcaseTabs
           </button>
         </div>
 
-        {/* Action Controls: View Switcher (Grid vs Feed) & Create Post */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {activeTab === "posts" && (
-            <div className="hidden sm:flex items-center bg-card border border-border/60 rounded-lg p-0.5">
-              <button
-                type="button"
-                onClick={() => setViewMode("grid")}
-                aria-label="Grid view"
-                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  viewMode === "grid"
-                    ? "bg-secondary text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode("feed")}
-                aria-label="Feed card view"
-                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
-                  viewMode === "feed"
-                    ? "bg-secondary text-primary"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
-          )}
-
-          <Button
-            size="sm"
-            className="h-[30px] sm:h-[32px] px-2.5 sm:px-3.5 rounded-[8px] text-xs font-semibold text-primary-foreground shadow-sm flex items-center gap-1 border-0 hover:brightness-110 cursor-pointer"
-            style={{ background: "var(--gradient-btn)" }}
-          >
-            <Plus className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Create Post</span>
-          </Button>
-        </div>
+        {/* Action Controls: View Switcher (Grid vs Feed) - desktop only */}
+        {activeTab === "posts" && (
+          <div className="hidden sm:flex items-center bg-card border border-border/60 rounded-lg p-0.5 mb-2">
+            <button
+              type="button"
+              onClick={() => setViewMode("grid")}
+              aria-label="Grid view"
+              className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                viewMode === "grid"
+                  ? "bg-secondary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Grid3X3 className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode("feed")}
+              aria-label="Feed card view"
+              className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                viewMode === "feed"
+                  ? "bg-secondary text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* 1. Posts Tab Content */}
