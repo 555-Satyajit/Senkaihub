@@ -13,9 +13,9 @@ export default function NotificationsPage() {
       <SidebarNav />
 
       {/* 2. Main Notification Feed Canvas */}
-      <div className="flex-1 flex flex-col min-w-0 max-w-2xl mx-auto w-full">
-        {/* Sticky Mobile/Desktop Header matching user's uploaded reference */}
-        <header className="sticky top-0 z-30 h-16 px-4 sm:px-6 bg-background/95 backdrop-blur-md border-b border-border/40 flex items-center gap-3">
+      <div className="flex-1 flex flex-col min-w-0 w-full">
+        {/* Sticky Mobile/Desktop Top Header */}
+        <header className="sticky top-0 z-30 h-16 px-4 sm:px-6 lg:px-8 bg-background/95 backdrop-blur-md border-b border-border/40 flex items-center gap-3">
           <Link
             href="/feed"
             aria-label="Back to feed"
@@ -28,9 +28,9 @@ export default function NotificationsPage() {
           </h1>
         </header>
 
-        {/* Clean Notification List */}
-        <main className="flex-1 w-full bg-card sm:border sm:border-border/60 sm:rounded-[24px] sm:my-6 overflow-hidden shadow-sm">
-          <NotificationList maxHeight="calc(100vh - 8rem)" />
+        {/* Full-width seamless list */}
+        <main className="flex-1 w-full max-w-4xl mx-auto">
+          <NotificationList isFullPage />
         </main>
       </div>
 
@@ -39,3 +39,4 @@ export default function NotificationsPage() {
     </div>
   );
 }
+

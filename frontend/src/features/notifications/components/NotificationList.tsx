@@ -10,10 +10,11 @@ import { NotificationItem } from "./NotificationItem";
 
 interface NotificationListProps {
   maxHeight?: string;
+  isFullPage?: boolean;
   onClose?: () => void;
 }
 
-export function NotificationList({ maxHeight = "420px" }: NotificationListProps) {
+export function NotificationList({ maxHeight, isFullPage = false }: NotificationListProps) {
   const [notifications, setNotifications] = useState<NotificationItemData[]>(mockNotifications);
   const [filter, setFilter] = useState<"all" | "unread" | "clans">("all");
 
@@ -40,9 +41,15 @@ export function NotificationList({ maxHeight = "420px" }: NotificationListProps)
   });
 
   return (
-    <div className="flex flex-col w-full bg-card">
-      {/* LinkedIn-style Filter Pills + Mark Read */}
-      <div className="px-4 py-2.5 border-b border-border/40 flex items-center justify-between gap-2">
+    <div className={`flex flex-col w-full ${isFullPage ? "bg-transparent" : "bg-card"}`}>
+      {/* LinkedIn-style Filter Pills + Mark Read (Sticky on mobile and desktop) */}
+      <div
+        className={`sticky z-20 px-4 sm:px-6 py-3 border-b border-border/40 flex items-center justify-between gap-2 backdrop-blur-md transition-colors ${
+          isFullPage
+            ? "top-16 bg-background/95"
+            : "top-0 bg-card/95"
+        }`}
+      >
         <Tabs
           value={filter}
           onValueChange={(val) => {
@@ -52,14 +59,14 @@ export function NotificationList({ maxHeight = "420px" }: NotificationListProps)
           }}
           className="w-auto"
         >
-          <TabsList className="h-8 bg-secondary/60 p-0.5 rounded-lg border border-border/50">
-            <TabsTrigger value="all" className="text-xs px-2.5 h-7 rounded-md">
+          <TabsList className="h-8 bg-secondary/70 p-0.5 rounded-lg border border-border/50">
+            <TabsTrigger value="all" className="text-xs px-2.5 h-7 rounded-md cursor-pointer">
               All
             </TabsTrigger>
-            <TabsTrigger value="unread" className="text-xs px-2.5 h-7 rounded-md">
+            <TabsTrigger value="unread" className="text-xs px-2.5 h-7 rounded-md cursor-pointer">
               Unread {unreadCount > 0 && `(${unreadCount})`}
             </TabsTrigger>
-            <TabsTrigger value="clans" className="text-xs px-2.5 h-7 rounded-md">
+            <TabsTrigger value="clans" className="text-xs px-2.5 h-7 rounded-md cursor-pointer">
               Clans
             </TabsTrigger>
           </TabsList>
@@ -70,7 +77,7 @@ export function NotificationList({ maxHeight = "420px" }: NotificationListProps)
             type="button"
             variant="ghost"
             onClick={handleMarkAllAsRead}
-            className="text-[11px] font-semibold h-7 px-2 text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-1"
+            className="text-[11px] font-semibold h-7 px-2 text-muted-foreground hover:text-foreground cursor-pointer flex items-center gap-1 hover:bg-secondary/60"
           >
             <Check className="w-3.5 h-3.5 text-primary" />
             <span>Mark read</span>
@@ -78,28 +85,55 @@ export function NotificationList({ maxHeight = "420px" }: NotificationListProps)
         )}
       </div>
 
-      {/* Scrollable Notification Items with ScrollArea */}
-      <ScrollArea className={`w-full custom-scrollbar scroll-fade-b`} style={{ maxHeight }}>
-        {filteredNotifications.length === 0 ? (
-          <div className="py-12 px-4 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
-            <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-              <BellOff className="w-5 h-5 text-muted-foreground/60" />
+      {/* Render notifications: Full page uses standard scrolling with sticky tabs; Popover uses ScrollArea */}
+      {isFullPage ? (
+        <div className="w-full">
+          {filteredNotifications.length === 0 ? (
+            <div className="py-20 px-4 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
+              <div className="w-12 h-12 rounded-full bg-secondary flex items-center justify-center">
+                <BellOff className="w-6 h-6 text-muted-foreground/60" />
+              </div>
+              <p className="text-sm font-medium">No notifications in this tab</p>
             </div>
-            <p className="text-xs font-medium">No notifications in this tab</p>
-          </div>
-        ) : (
-          <div className="flex flex-col">
-            {filteredNotifications.map((notif) => (
-              <NotificationItem
-                key={notif.id}
-                notification={notif}
-                onMarkAsRead={handleMarkAsRead}
-                onDelete={handleDelete}
-              />
-            ))}
-          </div>
-        )}
-      </ScrollArea>
+          ) : (
+            <div className="flex flex-col divide-y divide-border/20">
+              {filteredNotifications.map((notif) => (
+                <NotificationItem
+                  key={notif.id}
+                  notification={notif}
+                  onMarkAsRead={handleMarkAsRead}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <ScrollArea
+          className="w-full custom-scrollbar scroll-fade-b"
+          style={{ maxHeight: maxHeight || "420px" }}
+        >
+          {filteredNotifications.length === 0 ? (
+            <div className="py-12 px-4 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
+              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                <BellOff className="w-5 h-5 text-muted-foreground/60" />
+              </div>
+              <p className="text-xs font-medium">No notifications in this tab</p>
+            </div>
+          ) : (
+            <div className="flex flex-col divide-y divide-border/20">
+              {filteredNotifications.map((notif) => (
+                <NotificationItem
+                  key={notif.id}
+                  notification={notif}
+                  onMarkAsRead={handleMarkAsRead}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+          )}
+        </ScrollArea>
+      )}
     </div>
   );
 }
