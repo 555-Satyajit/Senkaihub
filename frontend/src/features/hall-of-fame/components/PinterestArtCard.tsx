@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MoreHorizontal, Share2 } from "lucide-react";
@@ -24,9 +24,19 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
   const [sharded, setSharded] = useState(false);
   const [shardsCount, setShardsCount] = useState<number>(item.shardsCount);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+  
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTapRef = useRef<number>(0);
 
-  const toggleShard = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  // Clear timer on unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
+
+  const triggerShardAnimation = () => {
     if (sharded) {
       setSharded(false);
       setShardsCount((prev: number) => prev - 1);
@@ -36,12 +46,45 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
     }
+
+    // Keep actions & count visible on mobile when double tapped or clicked
+    setShowOverlay(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setShowOverlay(false), 3000);
+  };
+
+  // Handles both desktop double-click and mobile double-tap / single-tap
+  const handlePinClick = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      // Double tap detected
+      triggerShardAnimation();
+    } else {
+      // Single tap: toggle overlay visibility on mobile
+      setShowOverlay((prev) => {
+        const next = !prev;
+        if (next) {
+          if (timerRef.current) clearTimeout(timerRef.current);
+          timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+        }
+        return next;
+      });
+    }
+    lastTapRef.current = now;
+  };
+
+  const toggleShard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerShardAnimation();
   };
 
   return (
     <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer">
       {/* 1. Pinterest Visual Pin Container */}
       <div 
+        onClick={handlePinClick}
         onDoubleClick={toggleShard}
         className={`relative w-full ${item.aspectRatio} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
       >
@@ -62,18 +105,30 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
           </div>
         )}
 
-        {/* Hover Dim Overlay */}
-        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-200" />
+        {/* Hover / Tap Dim Overlay */}
+        <div 
+          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 ${
+            showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
+          }`} 
+        />
 
         {/* Top-Left Category Tag */}
-        <div className="absolute top-3 left-3 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-200 z-10">
+        <div 
+          className={`absolute top-3 left-3 transition-opacity duration-200 z-10 ${
+            showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
+          }`}
+        >
           <span className="text-[10px] font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md">
             {item.animeSeries}
           </span>
         </div>
 
-        {/* Bottom Floating Quick Actions on Hover */}
-        <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover/pin:opacity-100 transition-all duration-200 flex items-center justify-between z-10">
+        {/* Bottom Floating Quick Actions (visible on hover OR when tapped/double-tapped on mobile) */}
+        <div 
+          className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-10 ${
+            showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 group-hover/pin:opacity-100 group-hover/pin:translate-y-0"
+          }`}
+        >
           {/* Flame Ignition Button (Zero background box) */}
           <div className="relative">
             <button
@@ -141,7 +196,7 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
         </div>
       </div>
 
-      {/* 2. Beneath-Pin Meta (Title + Clickable Creator Profile Row) */}
+      {/* 2. Beneath-Pin Meta (Title + Creator Row with Profile Link) */}
       <div className="px-1 flex flex-col gap-1">
         <h4 className="font-heading font-bold text-xs sm:text-sm text-foreground line-clamp-2 leading-snug group-hover/pin:underline">
           {item.title}
@@ -151,9 +206,9 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
           <Link
             href="/profile"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 min-w-0 group/creator cursor-pointer"
+            className="flex items-center gap-1.5 min-w-0 group/creator hover:opacity-90 transition-opacity"
           >
-            <Avatar className="w-5 h-5 rounded-full ring-1 ring-border/50 shrink-0 group-hover/creator:ring-primary transition-all">
+            <Avatar className="w-5 h-5 rounded-full ring-1 ring-border/50 shrink-0">
               <AvatarImage src={item.author.avatar} alt={item.author.name} />
               <AvatarFallback>{item.author.name[0]}</AvatarFallback>
             </Avatar>

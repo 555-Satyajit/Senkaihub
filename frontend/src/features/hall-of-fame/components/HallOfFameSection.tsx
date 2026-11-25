@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MoreHorizontal, Share2 } from "lucide-react";
@@ -76,6 +76,16 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   const [sharded, setSharded] = useState(false);
   const [shardsCount, setShardsCount] = useState<number>(entry.shardsCount);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [showOverlay, setShowOverlay] = useState<boolean>(false);
+
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTapRef = useRef<number>(0);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, []);
 
   // Dynamic natural heights for true Pinterest staggered layout
   const aspectRatios = [
@@ -88,8 +98,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   ];
   const aspectClass = aspectRatios[index % aspectRatios.length];
 
-  const toggleShard = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const triggerShardAnimation = () => {
     if (sharded) {
       setSharded(false);
       setShardsCount((prev: number) => prev - 1);
@@ -99,6 +108,34 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
       setIsAnimating(true);
       setTimeout(() => setIsAnimating(false), 600);
     }
+
+    setShowOverlay(true);
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => setShowOverlay(false), 3000);
+  };
+
+  const handlePinClick = () => {
+    const now = Date.now();
+    const DOUBLE_TAP_DELAY = 300;
+
+    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+      triggerShardAnimation();
+    } else {
+      setShowOverlay((prev) => {
+        const next = !prev;
+        if (next) {
+          if (timerRef.current) clearTimeout(timerRef.current);
+          timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+        }
+        return next;
+      });
+    }
+    lastTapRef.current = now;
+  };
+
+  const toggleShard = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerShardAnimation();
   };
 
   const getRankBadgeClasses = (rank: number) => {
@@ -118,6 +155,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
     <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer">
       {/* 1. Visual Canvas Pin with Clean Rounded Corners */}
       <div
+        onClick={handlePinClick}
         onDoubleClick={toggleShard}
         className={`relative w-full ${aspectClass} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
       >
@@ -138,8 +176,12 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
           </div>
         )}
 
-        {/* Hover Dim Overlay */}
-        <div className="absolute inset-0 bg-black/25 opacity-0 group-hover/pin:opacity-100 transition-opacity duration-200" />
+        {/* Hover / Tap Dim Overlay */}
+        <div 
+          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 ${
+            showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
+          }`} 
+        />
 
         {/* Top-Left: Big Bold Rank Number (#1, #2, #3, ...) */}
         <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
@@ -150,13 +192,21 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
           >
             #{entry.rank}
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md opacity-0 group-hover/pin:opacity-100 transition-opacity">
+          <span 
+            className={`text-[10px] font-bold uppercase tracking-wider bg-black/60 backdrop-blur-md text-white px-2 py-1 rounded-md transition-opacity ${
+              showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
+            }`}
+          >
             {entry.animeSeries}
           </span>
         </div>
 
-        {/* Bottom Floating Quick Actions on Hover */}
-        <div className="absolute bottom-3 left-3 right-3 opacity-0 group-hover/pin:opacity-100 transition-all duration-200 flex items-center justify-between z-10">
+        {/* Bottom Floating Quick Actions on Hover or Tap */}
+        <div 
+          className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-10 ${
+            showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 group-hover/pin:opacity-100 group-hover/pin:translate-y-0"
+          }`}
+        >
           {/* Flame Ignition Button (Zero background box) */}
           <div className="relative">
             <button
