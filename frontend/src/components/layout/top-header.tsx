@@ -4,6 +4,7 @@ import { Search, Bell, MessageSquare, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { NotificationPopover } from "@/features/notifications/containers/NotificationPopover";
 
 export function TopHeader() {
   return (
@@ -57,48 +58,36 @@ export function TopHeader() {
           <Plus aria-hidden="true" focusable="false" className="w-5 h-5 stroke-[2.6]" />
         </Link>
 
-        {/* Notifications Button */}
+        {/* Notifications Button on Mobile links to /notifications */}
         <div className="relative w-9 h-9">
-          <Button
-            variant="ghost"
+          <Link
+            href="/notifications"
             aria-label="Notifications"
             className="w-9 h-9 rounded-xl bg-card hover:bg-secondary border border-border/80 text-[#A6A9B6] hover:text-foreground shadow-sm transition-all flex items-center justify-center p-0"
           >
             <Bell aria-hidden="true" focusable="false" className="w-4 h-4 stroke-[2]" />
-          </Button>
+          </Link>
           <span 
             aria-hidden="true"
-            className="absolute top-1 right-1 w-2 h-2 bg-[#E46C5B] rounded-full ring-2 ring-card shadow-sm pointer-events-none" 
+            className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full ring-2 ring-card shadow-sm pointer-events-none" 
           />
         </div>
       </div>
 
       {/* Desktop Right Utility Buttons */}
       <div className="hidden md:flex items-center gap-3.5 shrink-0">
-        {/* Notifications Button */}
-        <div className="relative w-[50px] h-[50px]">
-          <Button
-            variant="ghost"
-            aria-label="Notifications"
-            className="w-[50px] h-[50px] rounded-[18px] bg-card hover:bg-secondary border border-border/80 text-[#A6A9B6] hover:text-foreground shadow-sm transition-all flex items-center justify-center p-0"
-          >
-            <Bell aria-hidden="true" focusable="false" className="!size-6 stroke-[2]" />
-          </Button>
-          <span 
-            aria-hidden="true"
-            className="absolute top-1 right-1 w-[9px] h-[9px] bg-[#E46C5B] rounded-full ring-2 ring-card shadow-sm pointer-events-none" 
-          />
-        </div>
+        {/* Notifications Popover Dropdown on Desktop */}
+        <NotificationPopover unreadCount={3} />
 
         {/* Messages Button */}
         <div className="relative w-[50px] h-[50px]">
-          <Button
-            variant="ghost"
+          <Link
+            href="/chat"
             aria-label="Messages"
             className="w-[50px] h-[50px] rounded-[18px] bg-card hover:bg-secondary border border-border/80 text-[#A6A9B6] hover:text-foreground shadow-sm transition-all flex items-center justify-center p-0"
           >
             <MessageSquare aria-hidden="true" focusable="false" className="!size-6 stroke-[2]" />
-          </Button>
+          </Link>
         </div>
 
         {/* User Profile Avatar Link */}
