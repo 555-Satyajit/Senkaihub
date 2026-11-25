@@ -44,7 +44,7 @@ export function NotificationList({ maxHeight, isFullPage = false }: Notification
     <div className={`flex flex-col w-full ${isFullPage ? "bg-transparent" : "bg-card"}`}>
       {/* LinkedIn-style Filter Pills + Mark Read (Sticky on mobile and desktop) */}
       <div
-        className={`sticky z-20 px-4 sm:px-6 py-3 border-b border-border/40 flex items-center justify-between gap-2 backdrop-blur-md transition-colors ${
+        className={`sticky z-20 py-2.5 px-3 sm:px-4 border-b border-border/40 flex items-center justify-between gap-2 backdrop-blur-md transition-colors w-full ${
           isFullPage
             ? "top-16 bg-background/95"
             : "top-0 bg-card/95"
@@ -85,7 +85,7 @@ export function NotificationList({ maxHeight, isFullPage = false }: Notification
         )}
       </div>
 
-      {/* Render notifications: Full page uses standard scrolling with sticky tabs; Popover uses ScrollArea */}
+      {/* Render notifications: Full page uses standard scrolling; Popover uses native scroll container with overscroll-contain */}
       {isFullPage ? (
         <div className="w-full">
           {filteredNotifications.length === 0 ? (
@@ -109,30 +109,34 @@ export function NotificationList({ maxHeight, isFullPage = false }: Notification
           )}
         </div>
       ) : (
-        <ScrollArea
-          className="w-full custom-scrollbar scroll-fade-b"
-          style={{ maxHeight: maxHeight || "420px" }}
-        >
-          {filteredNotifications.length === 0 ? (
-            <div className="py-12 px-4 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
-              <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
-                <BellOff className="w-5 h-5 text-muted-foreground/60" />
+        <div className="relative w-full">
+          <div
+            className="w-full overflow-y-auto overflow-x-hidden overscroll-contain custom-scrollbar touch-pan-y scroll-fade-b pb-4"
+            style={{ maxHeight: maxHeight || "400px" }}
+          >
+            {filteredNotifications.length === 0 ? (
+              <div className="py-12 px-4 flex flex-col items-center justify-center text-center text-muted-foreground gap-2">
+                <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                  <BellOff className="w-5 h-5 text-muted-foreground/60" />
+                </div>
+                <p className="text-xs font-medium">No notifications in this tab</p>
               </div>
-              <p className="text-xs font-medium">No notifications in this tab</p>
-            </div>
-          ) : (
-            <div className="flex flex-col divide-y divide-border/20">
-              {filteredNotifications.map((notif) => (
-                <NotificationItem
-                  key={notif.id}
-                  notification={notif}
-                  onMarkAsRead={handleMarkAsRead}
-                  onDelete={handleDelete}
-                />
-              ))}
-            </div>
-          )}
-        </ScrollArea>
+            ) : (
+              <div className="flex flex-col divide-y divide-border/20">
+                {filteredNotifications.map((notif) => (
+                  <NotificationItem
+                    key={notif.id}
+                    notification={notif}
+                    onMarkAsRead={handleMarkAsRead}
+                    onDelete={handleDelete}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+          {/* Subtle bottom gradient overlay for extra depth */}
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-card to-transparent" />
+        </div>
       )}
     </div>
   );

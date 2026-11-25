@@ -37,44 +37,61 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
     }
   };
 
-  const itemContent = (
+  return (
     <div
-      className={`w-full py-3.5 px-4 sm:px-5 flex items-start gap-3.5 transition-colors group cursor-pointer ${
-        isUnread ? "bg-secondary/40 hover:bg-secondary/70" : "hover:bg-secondary/30"
+      className={`w-full py-3.5 px-3 sm:px-4 flex items-start gap-3.5 transition-colors group cursor-pointer border-b border-border/30 last:border-b-0 ${
+        isUnread ? "bg-secondary/40 hover:bg-secondary/70" : "hover:bg-secondary/20"
       }`}
     >
-      {/* Squircle Avatar with Sub-badge */}
-      <div className="relative shrink-0 mt-0.5">
-        <div className="w-11 h-11 rounded-2xl overflow-hidden relative border border-border/60 group-hover:scale-105 transition-transform bg-secondary">
-          <Image
-            src={actor.avatar}
-            alt={actor.name}
-            fill
-            className="object-cover"
-          />
+      {/* Clickable Content area navigating to linkHref if present */}
+      <Link
+        href={linkHref || "#"}
+        onClick={(e) => {
+          if (!linkHref || linkHref === "#") {
+            e.preventDefault();
+          }
+        }}
+        className="flex-1 flex items-start gap-3.5 min-w-0 text-left focus-visible:outline-none"
+      >
+        {/* Squircle Avatar with Sub-badge */}
+        <div className="relative shrink-0 mt-0.5">
+          <div className="w-11 h-11 rounded-2xl overflow-hidden relative border border-border/60 group-hover:scale-105 transition-transform bg-secondary">
+            <Image
+              src={actor.avatar}
+              alt={actor.name}
+              fill
+              className="object-cover"
+            />
+          </div>
+
+          {/* Small Type Action Overlay */}
+          <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-card border border-border/80 flex items-center justify-center shadow-sm">
+            {renderTypeIcon()}
+          </div>
         </div>
 
-        {/* Small Type Action Overlay */}
-        <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-card border border-border/80 flex items-center justify-center shadow-sm">
-          {renderTypeIcon()}
+        {/* Text & Timing */}
+        <div className="flex-1 min-w-0 pr-1">
+          <p className="text-sm leading-snug text-foreground">
+            <span className="font-heading font-bold text-foreground hover:underline">
+              {actor.name}
+            </span>{" "}
+            <span className="text-muted-foreground font-normal">{content}</span>
+          </p>
+          <span className="text-[12px] text-muted-foreground/80 mt-1 block font-medium">
+            {time}
+          </span>
         </div>
-      </div>
+      </Link>
 
-      {/* Text & Timing */}
-      <div className="flex-1 min-w-0 pr-1">
-        <p className="text-sm leading-snug text-foreground">
-          <span className="font-heading font-bold text-foreground hover:underline">
-            {actor.name}
-          </span>{" "}
-          <span className="text-muted-foreground font-normal">{content}</span>
-        </p>
-        <span className="text-[12px] text-muted-foreground/80 mt-1 block font-medium">
-          {time}
-        </span>
-      </div>
-
-      {/* Right Actions: Unread Dot + Dropdown Menu */}
-      <div className="flex items-center gap-2 shrink-0 self-center" onClick={(e) => e.stopPropagation()}>
+      {/* Right Actions: Unread Dot + Dropdown Menu (Outside of Link to avoid triggering navigation) */}
+      <div
+        className="flex items-center gap-2 shrink-0 self-center"
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         {isUnread && (
           <span
             className="w-2 h-2 rounded-full bg-primary ring-2 ring-background shrink-0"
@@ -84,15 +101,23 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
 
         <DropdownMenu>
           <DropdownMenuTrigger
+            type="button"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
             className="w-8 h-8 rounded-full opacity-60 hover:opacity-100 hover:bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-all cursor-pointer focus-visible:outline-none"
             aria-label="Notification actions"
           >
             <MoreHorizontal className="w-4 h-4" />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-44 bg-card border-border/70 shadow-xl rounded-xl p-1">
+          <DropdownMenuContent align="end" className="w-44 bg-card border-border/70 shadow-xl rounded-xl p-1 z-50">
             {isUnread && onMarkAsRead && (
               <DropdownMenuItem
-                onClick={() => onMarkAsRead(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onMarkAsRead(id);
+                }}
                 className="text-xs font-medium cursor-pointer rounded-lg px-2.5 py-1.5 hover:bg-secondary text-foreground flex items-center gap-2"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
@@ -101,7 +126,10 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
             )}
             {onDelete && (
               <DropdownMenuItem
-                onClick={() => onDelete(id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(id);
+                }}
                 className="text-xs font-medium cursor-pointer rounded-lg px-2.5 py-1.5 hover:bg-destructive/10 text-destructive flex items-center gap-2"
               >
                 <Trash2 className="w-3.5 h-3.5" />
@@ -111,18 +139,6 @@ export function NotificationItem({ notification, onMarkAsRead, onDelete }: Notif
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
-    </div>
-  );
-
-  return (
-    <div className="border-b border-border/30 last:border-b-0">
-      {linkHref ? (
-        <Link href={linkHref} className="block focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-          {itemContent}
-        </Link>
-      ) : (
-        itemContent
-      )}
     </div>
   );
 }

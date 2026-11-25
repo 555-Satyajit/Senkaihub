@@ -36,7 +36,8 @@ export function NotificationPopover({ unreadCount = 3 }: NotificationPopoverProp
       <PopoverContent
         align="end"
         sideOffset={12}
-        className="w-[380px] sm:w-[420px] p-0 bg-card border-border/70 shadow-2xl rounded-2xl overflow-hidden"
+        className="w-[380px] sm:w-[420px] p-0 bg-card border-border/70 shadow-2xl rounded-2xl overflow-hidden focus:outline-none"
+        onWheel={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="h-12 px-4 border-b border-border/50 flex items-center justify-between bg-card/90">

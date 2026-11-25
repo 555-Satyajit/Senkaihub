@@ -189,18 +189,23 @@
   /* shadcn scroll-fade utilities */
   .scroll-fade,
   .scroll-fade-y {
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
     mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
   }
   .scroll-fade-b {
+    -webkit-mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
     mask-image: linear-gradient(to bottom, black calc(100% - 48px), transparent 100%);
   }
   .scroll-fade-t {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 48px);
     mask-image: linear-gradient(to bottom, transparent 0%, black 48px);
   }
   .scroll-fade-both {
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 36px, black calc(100% - 48px), transparent 100%);
     mask-image: linear-gradient(to bottom, transparent 0%, black 36px, black calc(100% - 48px), transparent 100%);
   }
   .scroll-fade-none {
+    -webkit-mask-image: none;
     mask-image: none;
   }
 }
