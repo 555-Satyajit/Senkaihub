@@ -13,10 +13,10 @@ export function TopHeader() {
         <Link
           href="/create-post"
           aria-label="Create Post"
-          className="w-10 h-10 rounded-xl text-primary-foreground shadow-md border-0 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+          className="w-9 h-9 rounded-xl text-primary-foreground shadow-md border-0 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
           style={{ background: "var(--gradient-btn)" }}
         >
-          <Plus aria-hidden="true" focusable="false" className="w-5 h-5 stroke-[2.6]" />
+          <Plus aria-hidden="true" focusable="false" className="w-4 h-4 stroke-[2.6]" />
         </Link>
       </div>
 
