@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
-  MessageCircle, 
+  Trophy, 
   Tv 
 } from "lucide-react";
 import { ClanBannerGuildIcon } from "@/components/icons/clan-banner-guild-icon";
@@ -20,7 +20,7 @@ interface NavItem {
 const mobileNavItems: NavItem[] = [
   { icon: Home, label: "Feeds", href: "/feed" },
   { icon: ClanBannerGuildIcon, label: "Clans", href: "/clan-wars" },
-  { icon: MessageCircle, label: "Chat", href: "/chat" },
+  { icon: Trophy, label: "The Apex", href: "/apex" },
   { icon: Tv, label: "Tracker", href: "/tracker" },
   { label: "Profile", href: "/profile", isAvatar: true },
 ];

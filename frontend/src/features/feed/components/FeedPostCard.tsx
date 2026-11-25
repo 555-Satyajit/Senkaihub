@@ -157,10 +157,10 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
               onClick={toggleShard}
               aria-label={sharded ? "Remove Soul Shard" : "Ignite Soul Shard"}
               aria-pressed={sharded}
-              className={`relative h-8 px-2 sm:px-2.5 gap-1.5 rounded-xl transition-all group overflow-visible ${
+              className={`relative h-8 px-1.5 gap-1.5 rounded-xl transition-all group overflow-visible hover:bg-transparent ${
                 sharded 
-                  ? "text-primary bg-primary/10 hover:bg-primary/15" 
-                  : "text-muted-foreground hover:text-primary hover:bg-primary/10"
+                  ? "text-primary" 
+                  : "text-muted-foreground hover:text-primary"
               }`}
             >
               <div className={isAnimating ? "animate-shard-pop" : "group-hover:scale-115 transition-transform"}>

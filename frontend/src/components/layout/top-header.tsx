@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Search, Bell, MessageSquare, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,18 +8,17 @@ import { NotificationPopover } from "@/features/notifications/containers/Notific
 export function TopHeader() {
   return (
     <header className="h-[64px] md:h-[84px] bg-background/90 backdrop-blur-md px-4 sm:px-6 md:px-8 xl:px-10 flex items-center justify-between gap-3 md:gap-6 sticky top-0 z-30 border-b border-border/40 md:border-b-0 max-w-[1720px] w-full mx-auto">
-      {/* Brand Logo - Distinct on mobile */}
-      <Link href="/feed" className="flex items-center gap-2.5 shrink-0" aria-label="SenkaiHub Home">
-        <div className="relative w-9 h-9 md:w-10 md:h-10 rounded-xl overflow-hidden ring-1 ring-primary/40 shadow-sm md:hidden">
-          <Image
-            src="/mainlogo.png"
-            alt="SenkaiHub Logo"
-            fill
-            className="object-cover"
-            priority
-          />
-        </div>
-      </Link>
+      {/* Mobile-Only Left Action: Plus Icon for Creating Post (Replaces Logo on mobile) */}
+      <div className="flex md:hidden items-center shrink-0">
+        <Link
+          href="/create-post"
+          aria-label="Create Post"
+          className="w-10 h-10 rounded-xl text-primary-foreground shadow-md border-0 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center cursor-pointer"
+          style={{ background: "var(--gradient-btn)" }}
+        >
+          <Plus aria-hidden="true" focusable="false" className="w-5 h-5 stroke-[2.6]" />
+        </Link>
+      </div>
 
       {/* Desktop Search Bar matching Figma Rectangle 6339 (526px x 52px, scalable on 2k+) */}
       <div className="relative hidden md:block w-full max-w-[526px] xl:max-w-[580px] h-[52px]">
@@ -37,7 +35,7 @@ export function TopHeader() {
         />
       </div>
 
-      {/* Mobile-Only Actions: Search + Plus Create Post + Notification */}
+      {/* Mobile-Only Right Actions: Search + Chat + Notification */}
       <div className="flex md:hidden items-center gap-2 ml-auto">
         {/* Search Icon Button */}
         <Button
@@ -48,14 +46,13 @@ export function TopHeader() {
           <Search aria-hidden="true" focusable="false" className="w-4 h-4 stroke-[2.2]" />
         </Button>
 
-        {/* Plus Icon for Creating Post */}
+        {/* Chat / Messages Button on Mobile */}
         <Link
-          href="/create-post"
-          aria-label="Create Post"
-          className="w-9 h-9 rounded-xl text-primary-foreground shadow-md border-0 hover:brightness-110 active:scale-95 transition-all flex items-center justify-center"
-          style={{ background: "var(--gradient-btn)" }}
+          href="/chat"
+          aria-label="Messages"
+          className="w-9 h-9 rounded-xl bg-card hover:bg-secondary border border-border/80 text-[#A6A9B6] hover:text-foreground shadow-sm transition-all flex items-center justify-center p-0"
         >
-          <Plus aria-hidden="true" focusable="false" className="w-5 h-5 stroke-[2.6]" />
+          <MessageSquare aria-hidden="true" focusable="false" className="w-4 h-4 stroke-[2]" />
         </Link>
 
         {/* Notifications Button on Mobile links to /notifications */}

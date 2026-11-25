@@ -9,7 +9,8 @@ import {
   Tv, 
   Plus, 
   Settings, 
-  LogOut 
+  LogOut,
+  Trophy
 } from "lucide-react";
 import { ClanBannerGuildIcon } from "@/components/icons/clan-banner-guild-icon";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -20,10 +21,11 @@ interface NavItem {
   href: string;
 }
 
-// 4 clean main feed sections (Profile is already in top header and right sidebar)
+// Main feed & community sections
 const topNavItems: NavItem[] = [
   { icon: Home, label: "Feeds", href: "/feed" },
   { icon: ClanBannerGuildIcon, label: "Clans", href: "/clan-wars" },
+  { icon: Trophy, label: "The Apex", href: "/apex" },
 ];
 
 const bottomNavItems: NavItem[] = [

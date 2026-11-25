@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Check, BellOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { NotificationItemData, mockNotifications } from "../model/notification-types";
 import { NotificationItem } from "./NotificationItem";
 
