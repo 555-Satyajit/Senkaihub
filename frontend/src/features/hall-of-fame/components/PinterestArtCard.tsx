@@ -27,14 +27,13 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastTouchTimeRef = useRef<number>(0);
+  const clickCountRef = useRef<number>(0);
+  const clickResetTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Clear timers on unmount
   useEffect(() => {
     return () => {
       if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
     };
   }, []);
 
@@ -57,24 +56,14 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
     overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
   }, []);
 
-  // Native touch handler specifically designed for iOS/Android mobile screens
-  const handleTouchEnd = () => {
-    const now = Date.now();
-    const DOUBLE_TAP_THRESHOLD = 320;
+  // Universal handler that works repeatedly on every double-tap / double-click across mobile & desktop
+  const handleCardInteraction = () => {
+    clickCountRef.current += 1;
 
-    if (now - lastTouchTimeRef.current < DOUBLE_TAP_THRESHOLD) {
-      // Confirmed Double Tap on Touch Device!
-      if (singleTapTimerRef.current) {
-        clearTimeout(singleTapTimerRef.current);
-        singleTapTimerRef.current = null;
-      }
-      lastTouchTimeRef.current = 0;
-      igniteShard();
-    } else {
-      // First tap: delay toggle so second tap can be registered
-      lastTouchTimeRef.current = now;
-      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
-      singleTapTimerRef.current = setTimeout(() => {
+    if (clickCountRef.current === 1) {
+      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
+      clickResetTimerRef.current = setTimeout(() => {
+        // Was a single click/tap: toggle overlay on mobile
         setShowOverlay((prev) => {
           const next = !prev;
           if (next) {
@@ -83,21 +72,29 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
           }
           return next;
         });
-        singleTapTimerRef.current = null;
-      }, DOUBLE_TAP_THRESHOLD);
+        clickCountRef.current = 0;
+      }, 280);
+    } else if (clickCountRef.current >= 2) {
+      // Confirmed double tap/click!
+      if (clickResetTimerRef.current) {
+        clearTimeout(clickResetTimerRef.current);
+        clickResetTimerRef.current = null;
+      }
+      clickCountRef.current = 0;
+      igniteShard();
     }
   };
 
-  const handleShardButtonClick = (e: React.MouseEvent) => {
+  const handleShardButtonClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
     igniteShard();
   };
 
   return (
-    <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer">
+    <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer select-none">
       {/* 1. Pinterest Visual Pin Container */}
       <div 
-        onTouchEnd={handleTouchEnd}
+        onClick={handleCardInteraction}
         onDoubleClick={(e) => {
           e.stopPropagation();
           igniteShard();
@@ -152,10 +149,6 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
             <button
               type="button"
               onClick={handleShardButtonClick}
-              onTouchEnd={(e) => {
-                e.stopPropagation();
-                handleShardButtonClick(e as unknown as React.MouseEvent);
-              }}
               aria-label={sharded ? "Remove Soul Shard" : "Ignite Soul Shard"}
               className={`h-8 px-2 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer relative overflow-visible ${
                 sharded
@@ -202,7 +195,6 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
               type="button"
               aria-label="Share pin"
               onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
               className="w-8 h-8 rounded-full bg-background/85 hover:bg-background text-foreground backdrop-blur-md flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-transform"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -211,7 +203,6 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
               type="button"
               aria-label="More options"
               onClick={(e) => e.stopPropagation()}
-              onTouchEnd={(e) => e.stopPropagation()}
               className="w-8 h-8 rounded-full bg-background/85 hover:bg-background text-foreground backdrop-blur-md flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-transform"
             >
               <MoreHorizontal className="w-3.5 h-3.5" />
@@ -230,7 +221,6 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
           <Link
             href="/profile"
             onClick={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0 group/creator hover:opacity-90 transition-opacity"
           >
             <Avatar className="w-5 h-5 rounded-full ring-1 ring-border/50 shrink-0">
