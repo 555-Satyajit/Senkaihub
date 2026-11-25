@@ -78,13 +78,13 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   const [isAnimating, setIsAnimating] = useState(false);
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
   const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const lastTapRef = useRef<number>(0);
+  const lastTouchTimeRef = useRef<number>(0);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
+      if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
       if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
     };
   }, []);
@@ -101,48 +101,48 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   const aspectClass = aspectRatios[index % aspectRatios.length];
 
   const igniteShard = useCallback(() => {
-    setSharded((prevSharded) => {
-      if (prevSharded) {
+    setSharded((prev) => {
+      if (prev) {
         setShardsCount((c) => c - 1);
         return false;
       } else {
         setShardsCount((c) => c + 1);
         setIsAnimating(true);
-        setTimeout(() => setIsAnimating(false), 600);
+        setTimeout(() => setIsAnimating(false), 650);
         return true;
       }
     });
 
     setShowOverlay(true);
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setShowOverlay(false), 3000);
+    if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
   }, []);
 
-  const handlePinClick = () => {
+  const handleTouchEnd = () => {
     const now = Date.now();
-    const DOUBLE_TAP_DELAY = 300;
+    const DOUBLE_TAP_THRESHOLD = 320;
 
-    if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
+    if (now - lastTouchTimeRef.current < DOUBLE_TAP_THRESHOLD) {
       if (singleTapTimerRef.current) {
         clearTimeout(singleTapTimerRef.current);
         singleTapTimerRef.current = null;
       }
-      lastTapRef.current = 0;
+      lastTouchTimeRef.current = 0;
       igniteShard();
     } else {
-      lastTapRef.current = now;
+      lastTouchTimeRef.current = now;
       if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
       singleTapTimerRef.current = setTimeout(() => {
         setShowOverlay((prev) => {
           const next = !prev;
           if (next) {
-            if (timerRef.current) clearTimeout(timerRef.current);
-            timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+            if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+            overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3500);
           }
           return next;
         });
         singleTapTimerRef.current = null;
-      }, DOUBLE_TAP_DELAY);
+      }, DOUBLE_TAP_THRESHOLD);
     }
   };
 
@@ -168,7 +168,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
     <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer">
       {/* 1. Visual Canvas Pin with Clean Rounded Corners */}
       <div
-        onClick={handlePinClick}
+        onTouchEnd={handleTouchEnd}
         onDoubleClick={(e) => {
           e.stopPropagation();
           igniteShard();
@@ -179,13 +179,13 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
           src={entry.imageUrl}
           alt={entry.title}
           fill
-          className="object-cover group-hover/pin:brightness-90 transition-all duration-300"
+          className="object-cover group-hover/pin:brightness-90 transition-all duration-300 pointer-events-none"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
 
         {/* Double-tap large centered flame animation */}
         {isAnimating && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20" aria-hidden="true">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30" aria-hidden="true">
             <div className="animate-shard-pop drop-shadow-[0_0_25px_rgba(255,42,54,0.8)]">
               <SoulShardIcon filled className="w-20 h-20 text-primary" />
             </div>
@@ -219,8 +219,10 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
 
         {/* Bottom Floating Quick Actions on Hover or Tap */}
         <div 
-          className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-10 ${
-            showOverlay ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-1 pointer-events-none group-hover/pin:opacity-100 group-hover/pin:translate-y-0 group-hover/pin:pointer-events-auto"
+          className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-20 ${
+            showOverlay 
+              ? "opacity-100 translate-y-0 pointer-events-auto" 
+              : "opacity-0 translate-y-1 pointer-events-none group-hover/pin:opacity-100 group-hover/pin:translate-y-0 group-hover/pin:pointer-events-auto"
           }`}
         >
           {/* Flame Ignition Button (Zero background box) */}
@@ -228,6 +230,10 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
             <button
               type="button"
               onClick={handleShardButtonClick}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                handleShardButtonClick(e as unknown as React.MouseEvent);
+              }}
               aria-label={sharded ? "Remove Soul Shard" : "Ignite Soul Shard"}
               className={`h-8 px-2 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer relative overflow-visible ${
                 sharded
@@ -274,6 +280,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
               type="button"
               aria-label="Share pin"
               onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
               className="w-8 h-8 rounded-full bg-background/85 hover:bg-background text-foreground backdrop-blur-md flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-transform"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -282,6 +289,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
               type="button"
               aria-label="More options"
               onClick={(e) => e.stopPropagation()}
+              onTouchEnd={(e) => e.stopPropagation()}
               className="w-8 h-8 rounded-full bg-background/85 hover:bg-background text-foreground backdrop-blur-md flex items-center justify-center shadow-md cursor-pointer hover:scale-105 active:scale-95 transition-transform"
             >
               <MoreHorizontal className="w-3.5 h-3.5" />
@@ -300,6 +308,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
           <Link
             href="/profile"
             onClick={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0 group/creator hover:opacity-90 transition-opacity"
           >
             <Avatar className="w-5 h-5 rounded-full ring-1 ring-border/50 shrink-0">
