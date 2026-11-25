@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MoreHorizontal, Share2 } from "lucide-react";
@@ -79,11 +79,13 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTapRef = useRef<number>(0);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
     };
   }, []);
 
@@ -98,44 +100,55 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   ];
   const aspectClass = aspectRatios[index % aspectRatios.length];
 
-  const triggerShardAnimation = () => {
-    if (sharded) {
-      setSharded(false);
-      setShardsCount((prev: number) => prev - 1);
-    } else {
-      setSharded(true);
-      setShardsCount((prev: number) => prev + 1);
-      setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 600);
-    }
+  const igniteShard = useCallback(() => {
+    setSharded((prevSharded) => {
+      if (prevSharded) {
+        setShardsCount((c) => c - 1);
+        return false;
+      } else {
+        setShardsCount((c) => c + 1);
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 600);
+        return true;
+      }
+    });
 
     setShowOverlay(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setShowOverlay(false), 3000);
-  };
+  }, []);
 
   const handlePinClick = () => {
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
 
     if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
-      triggerShardAnimation();
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+      lastTapRef.current = 0;
+      igniteShard();
     } else {
-      setShowOverlay((prev) => {
-        const next = !prev;
-        if (next) {
-          if (timerRef.current) clearTimeout(timerRef.current);
-          timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
-        }
-        return next;
-      });
+      lastTapRef.current = now;
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      singleTapTimerRef.current = setTimeout(() => {
+        setShowOverlay((prev) => {
+          const next = !prev;
+          if (next) {
+            if (timerRef.current) clearTimeout(timerRef.current);
+            timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+          }
+          return next;
+        });
+        singleTapTimerRef.current = null;
+      }, DOUBLE_TAP_DELAY);
     }
-    lastTapRef.current = now;
   };
 
-  const toggleShard = (e: React.MouseEvent) => {
+  const handleShardButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerShardAnimation();
+    igniteShard();
   };
 
   const getRankBadgeClasses = (rank: number) => {
@@ -156,7 +169,10 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
       {/* 1. Visual Canvas Pin with Clean Rounded Corners */}
       <div
         onClick={handlePinClick}
-        onDoubleClick={toggleShard}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          igniteShard();
+        }}
         className={`relative w-full ${aspectClass} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
       >
         <Image
@@ -178,13 +194,13 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
 
         {/* Hover / Tap Dim Overlay */}
         <div 
-          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 ${
+          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 pointer-events-none ${
             showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
           }`} 
         />
 
         {/* Top-Left: Big Bold Rank Number (#1, #2, #3, ...) */}
-        <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5">
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 pointer-events-none">
           <span
             className={`w-8 h-8 rounded-full font-black text-xs sm:text-sm flex items-center justify-center tracking-tight ${getRankBadgeClasses(
               entry.rank
@@ -204,14 +220,14 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
         {/* Bottom Floating Quick Actions on Hover or Tap */}
         <div 
           className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-10 ${
-            showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 group-hover/pin:opacity-100 group-hover/pin:translate-y-0"
+            showOverlay ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-1 pointer-events-none group-hover/pin:opacity-100 group-hover/pin:translate-y-0 group-hover/pin:pointer-events-auto"
           }`}
         >
           {/* Flame Ignition Button (Zero background box) */}
           <div className="relative">
             <button
               type="button"
-              onClick={toggleShard}
+              onClick={handleShardButtonClick}
               aria-label={sharded ? "Remove Soul Shard" : "Ignite Soul Shard"}
               className={`h-8 px-2 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer relative overflow-visible ${
                 sharded

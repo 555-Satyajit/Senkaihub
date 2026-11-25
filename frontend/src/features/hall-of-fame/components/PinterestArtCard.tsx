@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MoreHorizontal, Share2 } from "lucide-react";
@@ -27,57 +27,71 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
   
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const singleTapTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastTapRef = useRef<number>(0);
 
-  // Clear timer on unmount
+  // Clear timers on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
     };
   }, []);
 
-  const triggerShardAnimation = () => {
-    if (sharded) {
-      setSharded(false);
-      setShardsCount((prev: number) => prev - 1);
-    } else {
-      setSharded(true);
-      setShardsCount((prev: number) => prev + 1);
-      setIsAnimating(true);
-      setTimeout(() => setIsAnimating(false), 600);
-    }
+  // Shared toggle function that reliably flips state and runs animation
+  const igniteShard = useCallback(() => {
+    setSharded((prevSharded) => {
+      if (prevSharded) {
+        setShardsCount((c) => c - 1);
+        return false;
+      } else {
+        setShardsCount((c) => c + 1);
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 600);
+        return true;
+      }
+    });
 
-    // Keep actions & count visible on mobile when double tapped or clicked
+    // Reveal overlay with updated count and schedule auto-hide
     setShowOverlay(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setShowOverlay(false), 3000);
-  };
+  }, []);
 
-  // Handles both desktop double-click and mobile double-tap / single-tap
+  // Handles mobile tap and double-tap with debouncing to prevent conflict
   const handlePinClick = () => {
     const now = Date.now();
     const DOUBLE_TAP_DELAY = 300;
 
     if (now - lastTapRef.current < DOUBLE_TAP_DELAY) {
-      // Double tap detected
-      triggerShardAnimation();
+      // Double tap! Cancel any pending single-tap toggle and trigger ignition
+      if (singleTapTimerRef.current) {
+        clearTimeout(singleTapTimerRef.current);
+        singleTapTimerRef.current = null;
+      }
+      lastTapRef.current = 0; // reset
+      igniteShard();
     } else {
-      // Single tap: toggle overlay visibility on mobile
-      setShowOverlay((prev) => {
-        const next = !prev;
-        if (next) {
-          if (timerRef.current) clearTimeout(timerRef.current);
-          timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
-        }
-        return next;
-      });
+      lastTapRef.current = now;
+      // Delay single-tap toggle slightly to give double-tap a chance
+      if (singleTapTimerRef.current) clearTimeout(singleTapTimerRef.current);
+      singleTapTimerRef.current = setTimeout(() => {
+        setShowOverlay((prev) => {
+          const next = !prev;
+          if (next) {
+            if (timerRef.current) clearTimeout(timerRef.current);
+            timerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+          }
+          return next;
+        });
+        singleTapTimerRef.current = null;
+      }, DOUBLE_TAP_DELAY);
     }
-    lastTapRef.current = now;
   };
 
-  const toggleShard = (e: React.MouseEvent) => {
+  const handleShardButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    triggerShardAnimation();
+    igniteShard();
   };
 
   return (
@@ -85,7 +99,10 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
       {/* 1. Pinterest Visual Pin Container */}
       <div 
         onClick={handlePinClick}
-        onDoubleClick={toggleShard}
+        onDoubleClick={(e) => {
+          e.stopPropagation();
+          igniteShard();
+        }}
         className={`relative w-full ${item.aspectRatio} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
       >
         <Image
@@ -107,14 +124,14 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
 
         {/* Hover / Tap Dim Overlay */}
         <div 
-          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 ${
+          className={`absolute inset-0 bg-black/35 transition-opacity duration-200 pointer-events-none ${
             showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
           }`} 
         />
 
         {/* Top-Left Category Tag */}
         <div 
-          className={`absolute top-3 left-3 transition-opacity duration-200 z-10 ${
+          className={`absolute top-3 left-3 transition-opacity duration-200 z-10 pointer-events-none ${
             showOverlay ? "opacity-100" : "opacity-0 group-hover/pin:opacity-100"
           }`}
         >
@@ -126,14 +143,14 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
         {/* Bottom Floating Quick Actions (visible on hover OR when tapped/double-tapped on mobile) */}
         <div 
           className={`absolute bottom-3 left-3 right-3 transition-all duration-200 flex items-center justify-between z-10 ${
-            showOverlay ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1 group-hover/pin:opacity-100 group-hover/pin:translate-y-0"
+            showOverlay ? "opacity-100 translate-y-0 pointer-events-auto" : "opacity-0 translate-y-1 pointer-events-none group-hover/pin:opacity-100 group-hover/pin:translate-y-0 group-hover/pin:pointer-events-auto"
           }`}
         >
           {/* Flame Ignition Button (Zero background box) */}
           <div className="relative">
             <button
               type="button"
-              onClick={toggleShard}
+              onClick={handleShardButtonClick}
               aria-label={sharded ? "Remove Soul Shard" : "Ignite Soul Shard"}
               className={`h-8 px-2 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer relative overflow-visible ${
                 sharded
