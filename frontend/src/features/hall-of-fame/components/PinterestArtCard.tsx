@@ -27,13 +27,11 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const clickCountRef = useRef<number>(0);
-  const clickResetTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTapRef = useRef<number>(0);
 
   useEffect(() => {
     return () => {
       if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
     };
   }, []);
 
@@ -56,36 +54,35 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
     overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
   }, []);
 
-  // Universal handler that works repeatedly on every double-tap / double-click across mobile & desktop
-  const handleCardInteraction = () => {
-    clickCountRef.current += 1;
+  // Standard Instagram / TikTok double-tap pattern for touch screens:
+  // Tap 1 records timestamp. Tap 2 within 350ms triggers ignition!
+  // If tap gap > 350ms, it's just a single tap that toggles the overlay.
+  const handlePointerUp = (e: React.PointerEvent) => {
+    // Only handle touch pointers (mouse handles onDoubleClick)
+    if (e.pointerType === "mouse") return;
 
-    if (clickCountRef.current === 1) {
-      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
-      clickResetTimerRef.current = setTimeout(() => {
-        // Was a single click/tap: toggle overlay on mobile
-        setShowOverlay((prev) => {
-          const next = !prev;
-          if (next) {
-            if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-            overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3500);
-          }
-          return next;
-        });
-        clickCountRef.current = 0;
-      }, 280);
-    } else if (clickCountRef.current >= 2) {
-      // Confirmed double tap/click!
-      if (clickResetTimerRef.current) {
-        clearTimeout(clickResetTimerRef.current);
-        clickResetTimerRef.current = null;
-      }
-      clickCountRef.current = 0;
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current;
+
+    if (timeSinceLastTap > 0 && timeSinceLastTap < 350) {
+      // Confirmed exact 2 taps!
+      lastTapRef.current = 0; // reset
       igniteShard();
+    } else {
+      // First tap
+      lastTapRef.current = now;
+      setShowOverlay((prev) => {
+        const next = !prev;
+        if (next) {
+          if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+          overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+        }
+        return next;
+      });
     }
   };
 
-  const handleShardButtonClick = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleShardButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     igniteShard();
   };
@@ -94,12 +91,12 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
     <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer select-none">
       {/* 1. Pinterest Visual Pin Container */}
       <div 
-        onClick={handleCardInteraction}
+        onPointerUp={handlePointerUp}
         onDoubleClick={(e) => {
           e.stopPropagation();
           igniteShard();
         }}
-        className={`relative w-full ${item.aspectRatio} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
+        className={`relative w-full ${item.aspectRatio} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none touch-manipulation`}
       >
         <Image
           src={item.imageUrl}

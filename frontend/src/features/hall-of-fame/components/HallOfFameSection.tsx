@@ -79,24 +79,21 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
   const [showOverlay, setShowOverlay] = useState<boolean>(false);
 
   const overlayTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const clickCountRef = useRef<number>(0);
-  const clickResetTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lastTapRef = useRef<number>(0);
 
   useEffect(() => {
     return () => {
       if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
     };
   }, []);
 
-  // Dynamic natural heights for true Pinterest staggered layout
   const aspectRatios = [
-    "aspect-[9/16]", // Ultra tall
-    "aspect-[3/4]",  // Portrait
-    "aspect-[2/3]",  // Classic poster
-    "aspect-[4/5]",  // Instagram vertical
-    "aspect-[16/11]", // Landscape
-    "aspect-square", // Square
+    "aspect-[9/16]",
+    "aspect-[3/4]",
+    "aspect-[2/3]",
+    "aspect-[4/5]",
+    "aspect-[16/11]",
+    "aspect-square",
   ];
   const aspectClass = aspectRatios[index % aspectRatios.length];
 
@@ -118,33 +115,29 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
     overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3000);
   }, []);
 
-  const handleCardInteraction = () => {
-    clickCountRef.current += 1;
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (e.pointerType === "mouse") return;
 
-    if (clickCountRef.current === 1) {
-      if (clickResetTimerRef.current) clearTimeout(clickResetTimerRef.current);
-      clickResetTimerRef.current = setTimeout(() => {
-        setShowOverlay((prev) => {
-          const next = !prev;
-          if (next) {
-            if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
-            overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3500);
-          }
-          return next;
-        });
-        clickCountRef.current = 0;
-      }, 280);
-    } else if (clickCountRef.current >= 2) {
-      if (clickResetTimerRef.current) {
-        clearTimeout(clickResetTimerRef.current);
-        clickResetTimerRef.current = null;
-      }
-      clickCountRef.current = 0;
+    const now = Date.now();
+    const timeSinceLastTap = now - lastTapRef.current;
+
+    if (timeSinceLastTap > 0 && timeSinceLastTap < 350) {
+      lastTapRef.current = 0;
       igniteShard();
+    } else {
+      lastTapRef.current = now;
+      setShowOverlay((prev) => {
+        const next = !prev;
+        if (next) {
+          if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+          overlayTimerRef.current = setTimeout(() => setShowOverlay(false), 3500);
+        }
+        return next;
+      });
     }
   };
 
-  const handleShardButtonClick = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleShardButtonClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     igniteShard();
   };
@@ -166,12 +159,12 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
     <div className="break-inside-avoid mb-4 group/pin flex flex-col gap-2 cursor-pointer select-none">
       {/* 1. Visual Canvas Pin with Clean Rounded Corners */}
       <div
-        onClick={handleCardInteraction}
+        onPointerUp={handlePointerUp}
         onDoubleClick={(e) => {
           e.stopPropagation();
           igniteShard();
         }}
-        className={`relative w-full ${aspectClass} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none`}
+        className={`relative w-full ${aspectClass} rounded-[20px] overflow-hidden bg-secondary transition-all duration-300 select-none touch-manipulation`}
       >
         <Image
           src={entry.imageUrl}
