@@ -6,6 +6,7 @@ psycopg[binary]==3.3.9
 redis==8.2.0
 celery==5.7.0
 django-celery-beat==2.9.0
+django-unfold==0.110.1
 nh3==0.3.8
 httpx==0.29.0
 uvicorn==0.54.0

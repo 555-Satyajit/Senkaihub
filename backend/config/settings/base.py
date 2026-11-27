@@ -14,6 +14,9 @@ DEBUG = env.bool("DJANGO_DEBUG", default=False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=[])
 
 INSTALLED_APPS = [
+    "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.forms",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -121,4 +124,28 @@ LOGGING = {
     "disable_existing_loggers": False,
     "handlers": {"console": {"class": "logging.StreamHandler"}},
     "root": {"handlers": ["console"], "level": env("DJANGO_LOG_LEVEL", default="INFO")},
+}
+
+UNFOLD = {
+    "SITE_TITLE": "SenkaiHub Admin",
+    "SITE_HEADER": "SenkaiHub Admin Portal",
+    "SITE_SUBHEADER": "Control Center & Management",
+    "SITE_SYMBOL": "shield",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        "primary": {
+            "50": "255 241 242",
+            "100": "255 228 230",
+            "200": "254 205 211",
+            "300": "253 164 175",
+            "400": "251 113 133",
+            "500": "244 63 94",
+            "600": "225 29 72",
+            "700": "190 18 60",
+            "800": "159 18 57",
+            "900": "136 19 55",
+            "950": "76 5 25",
+        },
+    },
 }
