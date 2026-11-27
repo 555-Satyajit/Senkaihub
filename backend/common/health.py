@@ -4,6 +4,8 @@ from django.core.cache import cache
 from django.db import connection
 from ninja import Router, Schema, Status
 
+from common.errors import ErrorOut
+
 router = Router(tags=["health"])
 
 
@@ -14,8 +16,10 @@ class HealthOut(Schema):
 
 
 def _database_ok() -> bool:
+    # A query, not ensure_connection(): that skips reused connections the server already dropped.
     try:
-        connection.ensure_connection()
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
     except Exception:
         return False
     return True
@@ -29,9 +33,13 @@ def _cache_ok() -> bool:
         return False
 
 
-@router.get("", response={200: HealthOut, 503: HealthOut}, auth=None)
+@router.get("", response={200: HealthOut, 503: ErrorOut}, auth=None)
 def health(request):
-    database, cache_ok = _database_ok(), _cache_ok()
-    healthy = database and cache_ok
-    body = HealthOut(status="ok" if healthy else "degraded", database=database, cache=cache_ok)
-    return Status(200 if healthy else 503, body)
+    checks = {"database": _database_ok(), "cache": _cache_ok()}
+    if all(checks.values()):
+        return HealthOut(status="ok", **checks)
+    failing = {name: ["unavailable"] for name, ok in checks.items() if not ok}
+    return Status(
+        503,
+        ErrorOut(code="service_unavailable", message="A dependency is down.", fields=failing),
+    )

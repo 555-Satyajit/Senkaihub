@@ -33,6 +33,9 @@ Valkey runs one instance with two logical databases: db 0 for the Celery broker 
 the Django cache. Its config is [infra/valkey/valkey.conf](../infra/valkey/valkey.conf). In
 production, mount the same file and pass a strong `--requirepass` from a Dokploy secret.
 
+Static files are collected into the image and served by WhiteNoise, so no extra proxy route
+is needed for `/static/`.
+
 ## Checks
 
 ```bash
@@ -49,5 +52,15 @@ apps/<domain>/   one Django app per domain: models, schemas, selectors, services
                  permissions, api, tasks, tests
 ```
 
-Layer rules live in `.claude/skills/senkaihub-code-standards/references/backend-structure.md`.
+Each app keeps a strict layer order; a layer only calls the ones above it:
+
+| File | Responsibility |
+|---|---|
+| `models.py` | Tables and invariants only |
+| `selectors.py` | Read queries, no side effects |
+| `services.py` | All business rules and writes; raise `common.errors.RuleViolation` |
+| `permissions.py` | Who may see or do what |
+| `api.py` | Thin endpoints: validate, call one service or selector, return a schema |
+| `tasks.py` | Celery tasks that only call services; must be idempotent |
+
 Add a new domain app under `apps/`, register it in `INSTALLED_APPS`, and mount its router in `config/api.py`.

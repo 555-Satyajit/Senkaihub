@@ -15,3 +15,15 @@ CSRF_COOKIE_SECURE = True
 # Frontend and API live on sibling subdomains, so cookies are shared on the parent domain.
 SESSION_COOKIE_DOMAIN = env("DJANGO_COOKIE_DOMAIN", default=None)  # noqa: F405
 CSRF_COOKIE_DOMAIN = SESSION_COOKIE_DOMAIN
+
+# WhiteNoise serves collected static files (the admin's CSS/JS) from the app process.
+# Production only: locally, runserver serves static files and staticfiles/ does not exist.
+MIDDLEWARE = [
+    MIDDLEWARE[0],  # noqa: F405  SecurityMiddleware must stay first
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+    *MIDDLEWARE[1:],  # noqa: F405
+]
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}

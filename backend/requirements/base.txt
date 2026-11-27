@@ -9,3 +9,4 @@ django-celery-beat==2.9.0
 nh3==0.3.8
 httpx==0.29.0
 uvicorn==0.54.0
+whitenoise==6.12.0
