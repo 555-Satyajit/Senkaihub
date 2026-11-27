@@ -28,9 +28,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import type { ClanItem } from "../model/clan-types";
 
 interface CreateClanDialogProps {
-  onClanCreated?: (clan: any) => void;
+  onClanCreated?: (clan: ClanItem) => void;
 }
 
 interface ClanRole {
@@ -238,7 +239,7 @@ export function CreateClanDialog({ onClanCreated }: CreateClanDialogProps) {
 
               {motto && (
                 <div className="p-3.5 rounded-xl bg-secondary/40 border border-border/60 text-xs sm:text-sm text-foreground/90 italic">
-                  "{motto}"
+                  &ldquo;{motto}&rdquo;
                 </div>
               )}
 
@@ -375,7 +376,7 @@ export function CreateClanDialog({ onClanCreated }: CreateClanDialogProps) {
                         </Button>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">
-                        PNG or JPG image representing your clan's combat mascot or emblem. Appears on clan flags and war rankings.
+                        PNG or JPG image representing your clan&apos;s combat mascot or emblem. Appears on clan flags and war rankings.
                       </p>
                     </div>
                   </div>

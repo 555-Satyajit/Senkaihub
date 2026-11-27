@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Dices, Check, ArrowRight, User, RefreshCw } from "lucide-react";
@@ -16,18 +16,23 @@ interface OnboardingFlowProps {
   onComplete?: (profile: { username: string; avatarUrl: string }) => void;
 }
 
+// The server renders a fixed name; the client swaps in a random one during hydration
+// without a mismatch. Cached so every client render reads the same suggestion.
+const SERVER_USERNAME = "Shinobi_01";
+let clientUsername: string | null = null;
+const subscribeNoop = () => () => {};
+const getClientUsername = () => (clientUsername ??= generateCoolUsername());
+const getServerUsername = () => SERVER_USERNAME;
+
 export function OnboardingFlow({ initialEmail, onComplete }: OnboardingFlowProps) {
   const router = useRouter();
-  const [username, setUsername] = useState("Shinobi_01");
+  const suggestedUsername = useSyncExternalStore(subscribeNoop, getClientUsername, getServerUsername);
+  const [editedUsername, setUsername] = useState<string | null>(null);
+  const username = editedUsername ?? suggestedUsername;
   const [selectedAvatar, setSelectedAvatar] = useState(POPULAR_AVATARS[0]);
   const [avatarPoolOffset, setAvatarPoolOffset] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [validationError, setValidationError] = useState<string | null>(null);
-
-  // Generate randomized cool username on client mount to prevent SSR hydration mismatch
-  React.useEffect(() => {
-    setUsername(generateCoolUsername());
-  }, []);
 
   // Generates 16 avatars dynamically from the 380 pool
   const visibleAvatars = React.useMemo(() => {

@@ -293,7 +293,7 @@ export function ClanWarFrontView({ clan }: ClanWarFrontViewProps) {
 
                       {match.clanParticipant.submissionTitle && (
                         <p className="text-[10px] sm:text-[11px] text-foreground/90 font-medium line-clamp-1 italic bg-background/50 px-2 py-1 rounded mt-1.5">
-                          "{match.clanParticipant.submissionTitle}"
+                          &ldquo;{match.clanParticipant.submissionTitle}&rdquo;
                         </p>
                       )}
                     </div>
@@ -331,7 +331,7 @@ export function ClanWarFrontView({ clan }: ClanWarFrontViewProps) {
 
                       {match.rivalParticipant.submissionTitle && (
                         <p className="text-[10px] sm:text-[11px] text-foreground/90 font-medium line-clamp-1 italic bg-background/50 px-2 py-1 rounded mt-1.5">
-                          "{match.rivalParticipant.submissionTitle}"
+                          &ldquo;{match.rivalParticipant.submissionTitle}&rdquo;
                         </p>
                       )}
                     </div>

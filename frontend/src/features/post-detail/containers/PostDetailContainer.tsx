@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -35,7 +35,7 @@ export function PostDetailContainer({ post }: PostDetailContainerProps) {
   const [sharded, setSharded] = useState(false);
   const [shardsCount, setShardsCount] = useState(post.likesCount);
   const [isAnimating, setIsAnimating] = useState(false);
-  const lastTapRef = useState<{ time: number }>({ time: 0 })[0];
+  const lastTapRef = useRef(0);
 
   const toggleShard = () => {
     if (sharded) {
@@ -51,11 +51,11 @@ export function PostDetailContainer({ post }: PostDetailContainerProps) {
 
   const handleTouchEnd = () => {
     const now = Date.now();
-    if (now - lastTapRef.time < 300) {
+    if (now - lastTapRef.current < 300) {
       toggleShard();
-      lastTapRef.time = 0;
+      lastTapRef.current = 0;
     } else {
-      lastTapRef.time = now;
+      lastTapRef.current = now;
     }
   };
 
