@@ -160,7 +160,7 @@ function HallOfFamePinCard({ entry, index }: { entry: HallOfFameEntry; index: nu
         <div className="flex items-center justify-between gap-2 mt-0.5">
           {/* Creator Profile Link */}
           <Link
-            href="/profile"
+            href={`/profile/${entry.creator.username}`}
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0 group/creator hover:opacity-90 transition-opacity shrink"
           >

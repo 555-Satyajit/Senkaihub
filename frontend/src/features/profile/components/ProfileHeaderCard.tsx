@@ -1,40 +1,43 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
-import { Link2, ShieldCheck } from "lucide-react";
-import { UserProfile } from "../model/profile-types";
+import Link from "next/link";
+import { ShieldCheck, UserCheck, UserPlus, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ClanBannerGuildIcon } from "@/components/icons/clan-banner-guild-icon";
 import { SoulShardIcon } from "@/components/icons/soul-shard-icon";
+import { ClanBannerGuildIcon } from "@/components/icons/clan-banner-guild-icon";
+import { UserProfile } from "../model/profile-types";
 
 interface ProfileHeaderCardProps {
   profile: UserProfile;
+  isOwnProfile?: boolean;
 }
 
-export function ProfileHeaderCard({ profile }: ProfileHeaderCardProps) {
+export function ProfileHeaderCard({ profile, isOwnProfile = false }: ProfileHeaderCardProps) {
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  const toggleFollow = () => {
+    setIsFollowing((prev) => !prev);
+  };
+
   return (
-    <div className="w-full flex flex-col rounded-[24px] bg-card overflow-hidden border border-border/40 shadow-xl relative">
-      {/* 1. Cinematic Anime Banner */}
-      <div className="w-full h-[180px] md:h-[220px] relative overflow-hidden flex items-start justify-end p-4">
+    <div className="w-full bg-card rounded-[24px] overflow-hidden border border-border/60 shadow-xl transition-all">
+      {/* 1. Profile Banner Cover */}
+      <div className="relative w-full h-[180px] sm:h-[220px] md:h-[260px] bg-secondary overflow-hidden">
         <Image
           src={profile.bannerImage}
-          alt="Clan Banner"
+          alt={`${profile.name} banner`}
           fill
-          priority
           className="object-cover"
+          priority
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-card via-black/40 to-black/20" />
-
-        {/* Chain Link Button */}
-        <button
-          type="button"
-          aria-label="Copy profile link"
-          className="relative z-10 w-10 h-10 rounded-xl bg-card/75 backdrop-blur-md hover:bg-card text-foreground flex items-center justify-center border border-border/60 shadow transition-all cursor-pointer"
-        >
-          <Link2 className="w-5 h-5 -rotate-45" />
-        </button>
+        {/* Subtle Dark Gradient Overlay for optimal contrast */}
+        <div className="absolute inset-0 bg-gradient-to-t from-card via-black/30 to-black/20" />
       </div>
 
-      {/* 2. Main Profile Content Section */}
-      <div className="px-5 pb-6 pt-2 relative">
+      {/* 2. Profile Details & Stats Row */}
+      <div className="px-4 sm:px-6 md:px-8 pb-6 md:pb-8 relative">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
           
           {/* Left Column: Followers, Following, Shards Earned */}
@@ -104,22 +107,49 @@ export function ProfileHeaderCard({ profile }: ProfileHeaderCardProps) {
               {profile.clanName}
             </span>
 
-            {/* Action Buttons: Follow and Message */}
+            {/* Action Buttons: Follow/Following & Message for other users OR Edit Profile for own */}
             <div className="flex items-center gap-3 mt-4">
-              <Button
-                size="sm"
-                className="h-[38px] px-6 rounded-[10px] text-[13px] font-semibold text-primary-foreground shadow-md hover:brightness-110 active:scale-95 transition-all border-0 cursor-pointer"
-                style={{ background: "var(--gradient-btn)" }}
-              >
-                Follow
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-[38px] px-5 rounded-[10px] text-[13px] font-semibold border-border/80 bg-card hover:bg-secondary text-foreground transition-all cursor-pointer"
-              >
-                Message
-              </Button>
+              {isOwnProfile ? (
+                <Button
+                  size="sm"
+                  className="h-[38px] px-6 rounded-[10px] text-[13px] font-semibold text-primary-foreground shadow-md hover:brightness-110 active:scale-95 transition-all border-0 cursor-pointer"
+                  style={{ background: "var(--gradient-btn)" }}
+                >
+                  Edit Profile
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    size="sm"
+                    onClick={toggleFollow}
+                    className={`h-[38px] px-5 rounded-[10px] text-[13px] font-semibold transition-all border-0 cursor-pointer flex items-center gap-1.5 active:scale-95 ${
+                      isFollowing
+                        ? "bg-secondary hover:bg-secondary/80 text-foreground"
+                        : "text-primary-foreground shadow-md hover:brightness-110"
+                    }`}
+                    style={isFollowing ? undefined : { background: "var(--gradient-btn)" }}
+                  >
+                    {isFollowing ? (
+                      <>
+                        <UserCheck className="w-4 h-4" />
+                        Following
+                      </>
+                    ) : (
+                      <>
+                        <UserPlus className="w-4 h-4" />
+                        Follow
+                      </>
+                    )}
+                  </Button>
+                  <Link
+                    href="/chat"
+                    className="h-[38px] px-4 rounded-[10px] text-[13px] font-semibold border border-border/80 bg-card hover:bg-secondary text-foreground transition-all cursor-pointer flex items-center gap-1.5"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Message
+                  </Link>
+                </>
+              )}
             </div>
           </div>
 

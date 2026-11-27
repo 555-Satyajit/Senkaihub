@@ -5,7 +5,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { 
   Home, 
-  MessageCircle, 
   Tv, 
   Plus, 
   Settings, 
@@ -21,15 +20,14 @@ interface NavItem {
   href: string;
 }
 
-// Main feed & community sections
+// Main feed & community sections (Create Post is placed before The Apex)
 const topNavItems: NavItem[] = [
   { icon: Home, label: "Feeds", href: "/feed" },
   { icon: ClanBannerGuildIcon, label: "Clans", href: "/clan-wars" },
-  { icon: Trophy, label: "The Apex", href: "/apex" },
 ];
 
 const bottomNavItems: NavItem[] = [
-  { icon: MessageCircle, label: "Chat", href: "/chat" },
+  { icon: Trophy, label: "The Apex", href: "/apex" },
   { icon: Tv, label: "Tracker", href: "/tracker" },
 ];
 

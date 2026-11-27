@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   MessageCircle, 
   Send, 
@@ -53,22 +54,27 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
       {/* 1. Author & Clan Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 md:gap-3 min-w-0">
-          <div className="relative shrink-0">
-            <div className="p-0.5 rounded-2xl bg-gradient-to-tr from-primary via-accent to-primary">
-              <Avatar className="w-10 h-10 md:w-11 md:h-11 rounded-[14px] overflow-hidden">
-                <AvatarImage src={post.author.avatar} alt={post.author.name} />
-                <AvatarFallback className="rounded-[14px] bg-secondary text-foreground font-bold">
-                  {post.author.name[0]}
-                </AvatarFallback>
-              </Avatar>
+          <Link href={`/profile/${post.author.username}`} className="relative shrink-0 group/avatar">
+            <div className="p-[2px] rounded-full bg-gradient-to-tr from-primary via-accent to-primary group-hover/avatar:brightness-110 transition-all flex items-center justify-center">
+              <div className="w-10 h-10 md:w-11 md:h-11 rounded-full overflow-hidden relative bg-secondary">
+                <Image
+                  src={post.author.avatar}
+                  alt={post.author.name}
+                  fill
+                  className="object-cover rounded-full"
+                />
+              </div>
             </div>
-          </div>
+          </Link>
 
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 md:gap-2">
-              <span className="font-heading font-bold text-xs md:text-sm text-foreground hover:underline cursor-pointer truncate">
+              <Link 
+                href={`/profile/${post.author.username}`}
+                className="font-heading font-bold text-xs md:text-sm text-foreground hover:underline cursor-pointer truncate"
+              >
                 {post.author.username}
-              </span>
+              </Link>
               <Badge 
                 variant="outline"
                 className="text-[9px] md:text-[10px] font-semibold px-1.5 py-0 md:px-2 md:py-0.5 rounded-md border-border/80 bg-secondary/80 text-foreground shrink-0"
@@ -196,15 +202,17 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
           </div>
 
           {/* Comment with Count */}
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label={`${post.commentsCount} comments`}
-            className="h-8 px-2 sm:px-2.5 gap-1.5 text-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
-          >
-            <MessageCircle aria-hidden="true" focusable="false" className="w-4 h-4 md:w-5 md:h-5 stroke-[2]" />
-            <span className="text-xs font-semibold">{post.commentsCount}</span>
-          </Button>
+          <Link href={`/post/${post.id}`}>
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={`${post.commentsCount} comments`}
+              className="h-8 px-2 sm:px-2.5 gap-1.5 text-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all"
+            >
+              <MessageCircle aria-hidden="true" focusable="false" className="w-4 h-4 md:w-5 md:h-5 stroke-[2]" />
+              <span className="text-xs font-semibold">{post.commentsCount}</span>
+            </Button>
+          </Link>
 
           {/* Share */}
           <Button
@@ -262,9 +270,12 @@ export function FeedPostCard({ post }: FeedPostCardProps) {
 
       {/* 6. View All Comments Trigger */}
       {post.commentsCount > 0 && (
-        <span className="text-xs text-muted-foreground hover:text-foreground cursor-pointer -mt-1 font-medium">
+        <Link 
+          href={`/post/${post.id}`}
+          className="text-xs text-muted-foreground hover:text-foreground cursor-pointer -mt-1 font-medium inline-block"
+        >
           View all {post.commentsCount} comments
-        </span>
+        </Link>
       )}
 
       {/* 7. Inline Quick Comment Bar */}

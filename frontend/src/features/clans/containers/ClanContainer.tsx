@@ -3,15 +3,20 @@
 import { useState } from "react";
 import { ClanFilterBar } from "../components/ClanFilterBar";
 import { ClanCard } from "../components/ClanCard";
-import { sampleClans } from "../model/clan-types";
+import { sampleClans as initialSampleClans, ClanItem } from "../model/clan-types";
 import { FeedRightSidebar } from "@/features/feed/components/FeedRightSidebar";
 
 export function ClanContainer() {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [clans, setClans] = useState<ClanItem[]>(initialSampleClans);
+
+  const handleClanCreated = (newClan: ClanItem) => {
+    setClans((prev) => [newClan, ...prev]);
+  };
 
   const filteredClans = selectedCategory === "all"
-    ? sampleClans
-    : sampleClans.filter((c) => c.category === selectedCategory);
+    ? clans
+    : clans.filter((c) => c.category === selectedCategory);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 xl:grid-cols-14 gap-6 xl:gap-8 items-start">
@@ -20,6 +25,7 @@ export function ClanContainer() {
         <ClanFilterBar
           selectedCategory={selectedCategory}
           onSelectCategory={setSelectedCategory}
+          onClanCreated={handleClanCreated}
         />
 
         {/* 3-column grid matching Figma Rectangle 6407, 6408, 6409 */}

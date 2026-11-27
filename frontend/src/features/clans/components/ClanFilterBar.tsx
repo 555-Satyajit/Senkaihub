@@ -2,10 +2,12 @@
 
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { CreateClanDialog } from "./CreateClanDialog";
 
 interface ClanFilterBarProps {
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
+  onClanCreated?: (clan: any) => void;
 }
 
 const filterOptions = [
@@ -17,30 +19,35 @@ const filterOptions = [
   { id: "top-tier", label: "S-Tier Citadels" },
 ];
 
-export function ClanFilterBar({ selectedCategory, onSelectCategory }: ClanFilterBarProps) {
+export function ClanFilterBar({ selectedCategory, onSelectCategory, onClanCreated }: ClanFilterBarProps) {
   return (
     <div className="flex flex-col gap-4 md:gap-5 w-full">
-      {/* Title & Filters action header */}
-      <div className="flex items-center justify-between">
+      {/* Title & Actions: "Clans", Create Clan, and Filters */}
+      <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
           <h1 className="font-heading font-black text-2xl md:text-[30px] text-foreground tracking-tight leading-[38px]">
-            Clans & Guilds
+            Clans
           </h1>
           <p className="text-xs text-muted-foreground mt-0.5">
             Join a faction, compete in weekly Clan Wars, and conquer raid citadels.
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          className="h-[38px] px-4 rounded-[8px] bg-transparent border-border/80 hover:bg-secondary/40 text-foreground text-[13px] font-semibold flex items-center gap-2 transition-colors cursor-pointer"
-        >
-          <SlidersHorizontal className="w-4 h-4 text-foreground" />
-          <span>Filters</span>
-        </Button>
+        <div className="flex items-center gap-2.5">
+          {/* Create a Clan Button */}
+          <CreateClanDialog onClanCreated={onClanCreated} />
+
+          <Button
+            variant="outline"
+            className="h-[38px] px-4 rounded-[8px] bg-transparent border-border/80 hover:bg-secondary/40 text-foreground text-[13px] font-semibold flex items-center gap-2 transition-colors cursor-pointer"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-foreground" />
+            <span>Filters</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Category Filter Pills with smooth touch-drag and invisible scrollbar */}
+      {/* Category Filter Pills */}
       <div className="w-full overflow-x-auto scrollbar-none pb-1">
         <div className="flex items-center gap-2.5">
           {filterOptions.map((opt) => {

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Star, Shield, Users } from "lucide-react";
 import { ClanItem } from "../model/clan-types";
 import { Button } from "@/components/ui/button";
@@ -10,8 +11,8 @@ interface ClanCardProps {
 export function ClanCard({ clan }: ClanCardProps) {
   return (
     <div className="bg-card rounded-[20px] overflow-hidden flex flex-col border border-border/40 hover:border-border/80 transition-all shadow-md group select-none">
-      {/* 1. Card Media Banner (Rectangle 6410: height 140px, rounded-t-[20px]) */}
-      <div className="relative w-full h-[140px] bg-secondary overflow-hidden">
+      {/* 1. Card Media Banner (Clickable to Clan Citadel) */}
+      <Link href={`/clan/${clan.id}`} className="relative w-full h-[140px] bg-secondary overflow-hidden block cursor-pointer">
         <Image
           src={clan.bannerUrl}
           alt={clan.name}
@@ -25,11 +26,11 @@ export function ClanCard({ clan }: ClanCardProps) {
           <Users className="w-3 h-3 text-primary" />
           <span>{clan.memberCount}</span>
         </div>
-      </div>
+      </Link>
 
       {/* 2. Floating Overlapping Crest / Leader Avatar */}
       <div className="px-4 relative flex items-center justify-between -mt-7 z-10">
-        <div className="relative">
+        <Link href={`/clan/${clan.id}`} className="relative cursor-pointer">
           <div className="relative w-[54px] h-[54px] rounded-full overflow-hidden border-[4px] border-card shadow-lg bg-secondary">
             <Image
               src={clan.crestUrl}
@@ -42,24 +43,28 @@ export function ClanCard({ clan }: ClanCardProps) {
           <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full overflow-hidden border-2 border-white shadow bg-primary flex items-center justify-center text-primary-foreground">
             <Shield className="w-2.5 h-2.5" />
           </div>
-        </div>
+        </Link>
 
-        <Button
-          size="sm"
-          className="rounded-lg text-primary-foreground font-semibold px-3 h-7 text-[11px] shadow-sm border-0 hover:brightness-110 active:scale-95"
-          style={{ background: "var(--gradient-btn)" }}
-        >
-          Join Clan
-        </Button>
+        <Link href={`/clan/${clan.id}`}>
+          <Button
+            size="sm"
+            className="rounded-lg text-primary-foreground font-semibold px-3 h-7 text-[11px] shadow-sm border-0 hover:brightness-110 active:scale-95 cursor-pointer"
+            style={{ background: "var(--gradient-btn)" }}
+          >
+            Enter Citadel
+          </Button>
+        </Link>
       </div>
 
       {/* 3. Clan Details */}
       <div className="px-4 pt-2.5 pb-4 flex flex-col flex-1 justify-between gap-3">
         <div>
           {/* Name & Tier */}
-          <h2 className="font-heading font-bold text-[14px] text-foreground leading-tight truncate">
-            {clan.name}
-          </h2>
+          <Link href={`/clan/${clan.id}`} className="block group-hover:text-primary transition-colors cursor-pointer">
+            <h2 className="font-heading font-bold text-[14px] text-foreground leading-tight truncate">
+              {clan.name}
+            </h2>
+          </Link>
           <span className="text-[10px] text-accent font-semibold block mt-0.5">
             {clan.tier}
           </span>

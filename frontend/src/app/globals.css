@@ -156,6 +156,26 @@
   animation: spark-float 0.6s ease-out forwards;
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--secondary) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    var(--secondary) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.8s infinite linear;
+}
+
 /* Custom Clean Scrollbar Utility */
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {

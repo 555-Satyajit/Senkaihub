@@ -79,7 +79,7 @@ export function PinterestArtCard({ item }: PinterestArtCardProps) {
         <div className="flex items-center justify-between gap-2 mt-0.5">
           {/* Creator Profile Link */}
           <Link
-            href="/profile"
+            href={`/profile/${item.author.username}`}
             onClick={(e) => e.stopPropagation()}
             className="flex items-center gap-1.5 min-w-0 group/creator hover:opacity-90 transition-opacity shrink"
           >
