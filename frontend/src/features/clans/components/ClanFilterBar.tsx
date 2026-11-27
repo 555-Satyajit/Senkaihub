@@ -3,11 +3,12 @@
 import { SlidersHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CreateClanDialog } from "./CreateClanDialog";
+import type { ClanItem } from "../model/clan-types";
 
 interface ClanFilterBarProps {
   selectedCategory: string;
   onSelectCategory: (cat: string) => void;
-  onClanCreated?: (clan: any) => void;
+  onClanCreated?: (clan: ClanItem) => void;
 }
 
 const filterOptions = [

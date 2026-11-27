@@ -234,7 +234,7 @@ export function CommentItemCard({
               Replying to @{comment.replyTo.authorUsername}
             </div>
             <div className="text-muted-foreground text-[11px] line-clamp-1 italic">
-              "{comment.replyTo.snippet}"
+              &ldquo;{comment.replyTo.snippet}&rdquo;
             </div>
           </div>
         )}

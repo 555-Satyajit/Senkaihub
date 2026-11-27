@@ -8,8 +8,10 @@ reviews:
   profile: "chill"
   request_changes_workflow: false
   high_level_summary: true
+  # Manual reviews only: comment `@coderabbitai review` on a PR to request one.
   auto_review:
-    enabled: true
+    enabled: false
+    auto_incremental_review: false
     drafts: false
 
   # Enforce SenkaiHub's permanent architectural & styling rules across all frontend files
@@ -37,3 +39,16 @@ reviews:
         4. Code Quality & Accessibility:
            - Ensure accessibility attributes (`aria-label`, `aria-hidden`) on icons and icon-only buttons.
            - Clean TypeScript types without `any`.
+    - path: "backend/**"
+      instructions: |
+        You are reviewing SenkaiHub's Django + Django Ninja backend.
+
+        Always enforce the following project rules:
+        1. Layering: models.py (data only) -> selectors.py (reads) -> services.py (ALL business rules and writes)
+           -> permissions.py (access rules) -> api.py (thin endpoints) -> tasks.py (Celery tasks that only call services).
+        2. No business logic or non-trivial ORM queries in api.py. Endpoints validate, call one service or selector, return a schema.
+        3. The server enforces every lock: locked vault responses must never contain protected content.
+        4. Services raise common.errors.RuleViolation; every error uses the shared {code, message, fields} shape.
+        5. User HTML is sanitized with common.sanitize before saving.
+        6. Votes and war entries go through services with rule checks; Celery tasks must be idempotent.
+        7. Every service rule and permission has a pytest test (allowed and denied cases).

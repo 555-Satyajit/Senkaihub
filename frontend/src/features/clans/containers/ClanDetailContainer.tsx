@@ -152,7 +152,7 @@ export function ClanDetailContainer({ clan }: ClanDetailContainerProps) {
           {/* Battle Motto */}
           {clanData.motto && (
             <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic max-w-3xl">
-              "{clanData.motto}"
+              &ldquo;{clanData.motto}&rdquo;
             </p>
           )}
 

@@ -29,3 +29,12 @@ yarn-error.log*
 .gemini/
 *.tsbuildinfo
 next-env.d.ts
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+backend/staticfiles/
+backend/media/
